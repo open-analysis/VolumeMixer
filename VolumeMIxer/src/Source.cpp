@@ -1,3 +1,5 @@
+#include <vector>
+#include <iostream>
 #include "SetVolume.h"
 #include "MainVolumeControl.h"
 
@@ -53,13 +55,25 @@ void testMainVolumeControl()
 	MainVolumeControl mvc;
 	BOOL mute = 1;
 	float volume = 0.0f;
+	std::vector<std::wstring> names;
 
 	mvc.init();
 
-	mvc.getMute(L"Spotify", &mute);
+	/*mvc.getMute(L"Spotify", &mute);
 	printf("\tMute state: %d\n", mute);
 	printf("Toggling Spotify\n");
-	mvc.toggleMute(L"Spotify");
+	mvc.toggleMute(L"Spotify");*/
+
+	mvc.getAudioStreams(names);
+	fflush(stdout);
+	printf("\n\n");
+	for (int i = 0; i < names.size(); i++)
+	{
+		//printf("Main\tI: %d | %ls\n", i, names.at(i));
+		std::cout << "I: " << i << " |  ";
+		std::wcout << names.at(i) << std::endl;
+		printf("\n");
+	}
 
 	/*printf("\nRunning GetMute\n");
 	mvc.getMuteSpotify(&mute);

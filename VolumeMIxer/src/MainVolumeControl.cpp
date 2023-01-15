@@ -253,18 +253,6 @@ void MainVolumeControl::getMute(const WCHAR *i_name, BOOL* o_mute)
 	}
 }
 
-void MainVolumeControl::check(HRESULT hr)
-{
-	if (hr != S_OK) 
-	{
-		//printf(errMsg);
-		printf("Failed\n");
-		printf("Error Code: 0x%08lx\n", hr);
-		CoUninitialize();
-		exit(-1);
-	}
-}
-
 void MainVolumeControl::destroy()
 {
 	// Release the resources
@@ -274,13 +262,14 @@ void MainVolumeControl::destroy()
 	CoUninitialize();
 }
 
-void MainVolumeControl::getAudioStreams(std::vector<WCHAR*>* o_streams)
+void MainVolumeControl::getAudioStreams(std::vector<std::wstring>& o_streams)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
 	IAudioSessionControl2* audioSessionControl2;
 	HRESULT hr;
 
+	std::wstring progName;
 	hr = m_audioSessionManager2->GetSessionEnumerator(&audioSessionEnumerator);
 	if (SUCCEEDED(hr))
 	{
@@ -305,8 +294,10 @@ void MainVolumeControl::getAudioStreams(std::vector<WCHAR*>* o_streams)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
-								// Need to strip the name from back to front starting to the left of .exe
-								o_streams->push_back(wsImageName);
+								/*printf("\nImage: %ls\n", wsImageName);
+								progName = extractName(wsImageName);
+								std::wcout << "Prog: " << progName << std::endl;*/
+								o_streams.push_back(progName);
 							}
 							CloseHandle(hProcess);
 						}
@@ -318,4 +309,67 @@ void MainVolumeControl::getAudioStreams(std::vector<WCHAR*>* o_streams)
 		}
 		audioSessionEnumerator->Release();
 	}
+}
+
+void MainVolumeControl::check(HRESULT hr)
+{
+	if (hr != S_OK)
+	{
+		//printf(errMsg);
+		printf("Failed\n");
+		printf("Error Code: 0x%08lx\n", hr);
+		CoUninitialize();
+		exit(-1);
+	}
+}
+
+std::wstring MainVolumeControl::extractName(WCHAR i_imageName[])
+{
+	constexpr u_int LEN_IMAGE_MAX = MAX_PATH + 1;
+	std::wstring o_progName;
+
+	u_int endImage = 0; // Starting just before the .exe of the path
+	u_int startExe = 0; // Starting just before the .exe of the path
+	u_int startProg = endImage;
+	u_int lenImage = 0;
+	u_int lenProg = 0;
+	u_int check = 0;
+
+	// Start by finding the end of the path
+	for (u_int i = 0; i < LEN_IMAGE_MAX; i++)
+	{
+		if ((check == 0) && (i_imageName[i] == L'.')) check++;
+		else if ((check == 1) && (i_imageName[i] == L'e')) check++;
+		else if ((check == 2) && (i_imageName[i] == L'x')) check++;
+		else if ((check == 3) && (i_imageName[i] == L'e'))
+		{
+			endImage = i;
+			startProg = endImage - 4;
+			startExe = endImage - 3;
+			break;
+		}
+		else
+		{
+			check = 0;
+		}
+	}
+
+	// Find the starting character location the program name
+	//  and gets the length of the name
+	while (i_imageName[startProg] != L'\\')
+	{
+		lenProg++;
+		startProg--;
+	}
+	
+	startProg++;
+	lenProg--;
+
+	for (u_int i = startProg; i < startExe; i++)
+	{
+		o_progName += i_imageName[i];
+	}
+
+	return o_progName;
+
 }

@@ -1,11 +1,14 @@
 #pragma once
 
+#include <string>
 #include <cstdio>
 #include <windows.h>
 #include <audioclient.h>
 #include <audiopolicy.h>
 #include <Mmdeviceapi.h>
 #include <vector>
+
+#include <iostream>
 
 class MainVolumeControl
 {
@@ -21,12 +24,16 @@ public:
 	void init();
 	void destroy();
 
-	void getAudioStreams(std::vector<WCHAR*>*);
+	void getAudioStreams(std::vector<std::wstring>&);
 	
 	void setVolume(const WCHAR*, const float*);
 	void getVolume(const WCHAR*, float*);
 	void toggleMute(const WCHAR*);
 	void getMute(const WCHAR*, BOOL*);
 
+
+private:
 	void check(HRESULT);
+	
+	std::wstring extractName(WCHAR[]);
 };

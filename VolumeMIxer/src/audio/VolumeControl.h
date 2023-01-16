@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <cstdio>
 #include <windows.h>
 #include <audioclient.h>

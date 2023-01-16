@@ -18,30 +18,24 @@
     <ClCompile Include="src\Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\SetVolume.cpp">
+    <ClCompile Include="src\audio\VolumeControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GetAudioSession.cpp">
+    <ClCompile Include="src\audio\InputControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\OutputDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MainVolumeControl.cpp">
+    <ClCompile Include="src\utils\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\SetVolume.h">
+    <ClInclude Include="src\audio\VolumeControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GetAudioSession.h">
+    <ClInclude Include="src\audio\InputControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OutputDevice.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MainVolumeControl.h">
+    <ClInclude Include="src\utils\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

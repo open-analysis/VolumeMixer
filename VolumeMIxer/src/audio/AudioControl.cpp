@@ -1,60 +1,43 @@
-#include "VolumeControl.h"
+#include "AudioControl.h"
 
-VolumeControl::VolumeControl()
+AudioControl::AudioControl()
 {
-	AudioControl::init(eRender, eConsole);
+	m_deviceEnumerator = NULL;
+	m_device = NULL;
+	m_audioSessionManager2 = NULL;
 }
 
-void VolumeControl::getAudioStreams(std::vector<std::wstring>& o_streams)
+void AudioControl::init(EDataFlow dataFlow, ERole role)
 {
-	IAudioSessionEnumerator* audioSessionEnumerator;
-	IAudioSessionControl* audioSessionControl;
-	IAudioSessionControl2* audioSessionControl2;
-	HRESULT hr;
-
-	std::wstring progName;
-	hr = m_audioSessionManager2->GetSessionEnumerator(&audioSessionEnumerator);
+	HRESULT hr = CoInitialize(NULL);
 	if (SUCCEEDED(hr))
 	{
-		int nSessionCount;
-		hr = audioSessionEnumerator->GetCount(&nSessionCount);
-		for (int n = 0; n < nSessionCount; n++)
+		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&m_deviceEnumerator);
+		if (SUCCEEDED(hr))
 		{
-			hr = audioSessionEnumerator->GetSession(n, &audioSessionControl);
+			hr = m_deviceEnumerator->GetDefaultAudioEndpoint(dataFlow, role, &m_device);
 			if (SUCCEEDED(hr))
 			{
-				hr = audioSessionControl->QueryInterface(__uuidof(IAudioSessionControl2), (void**)&audioSessionControl2);
+				hr = m_device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (VOID**)&m_audioSessionManager2);
 				if (SUCCEEDED(hr))
 				{
-					DWORD nPID = 0;
-					hr = audioSessionControl2->GetProcessId(&nPID);
-					if (SUCCEEDED(hr))
-					{
-						HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, nPID);
-						if (hProcess != NULL)
-						{
-							WCHAR wsImageName[MAX_PATH + 1];
-							DWORD nSize = MAX_PATH;
-							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
-							{
-								//printf("\nImage: %ls\n", wsImageName);
-								progName = util.extractName(wsImageName);
-								//std::wcout << "Prog: " << progName << std::endl;
-								o_streams.push_back(progName);
-							}
-							CloseHandle(hProcess);
-						}
-					}
-					audioSessionControl2->Release();
+					return;
 				}
 			}
-			audioSessionControl->Release();
 		}
-		audioSessionEnumerator->Release();
 	}
 }
 
-void VolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
+void AudioControl::destroy()
+{
+	// Release the resources
+	m_audioSessionManager2->Release();
+	m_device->Release();
+	m_deviceEnumerator->Release();
+	CoUninitialize();
+}
+
+void AudioControl::toggleMute(const WCHAR* i_name)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -92,7 +75,9 @@ void VolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
 									if (SUCCEEDED(hr))
 									{
-										simpleAudioVolume->SetMasterVolume(*i_volume, NULL);
+										BOOL muted;
+										hr = simpleAudioVolume->GetMute(&muted);
+										hr = simpleAudioVolume->SetMute(!muted, NULL);
 										simpleAudioVolume->Release();
 									}
 								}
@@ -109,7 +94,7 @@ void VolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
 	}
 }
 
-void VolumeControl::getVolume(const WCHAR* i_name, float* o_level)
+void AudioControl::setMute(const WCHAR* i_name, const BOOL* i_mute)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -147,7 +132,60 @@ void VolumeControl::getVolume(const WCHAR* i_name, float* o_level)
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
 									if (SUCCEEDED(hr))
 									{
-										simpleAudioVolume->GetMasterVolume(o_level);
+										hr = simpleAudioVolume->SetMute(*i_mute, NULL);
+										simpleAudioVolume->Release();
+									}
+								}
+							}
+							CloseHandle(hProcess);
+						}
+					}
+					audioSessionControl2->Release();
+				}
+			}
+			audioSessionControl->Release();
+		}
+		audioSessionEnumerator->Release();
+	}
+}
+
+void AudioControl::getMute(const WCHAR* i_name, BOOL* o_mute)
+{
+	IAudioSessionEnumerator* audioSessionEnumerator;
+	IAudioSessionControl* audioSessionControl;
+	IAudioSessionControl2* audioSessionControl2;
+	HRESULT hr;
+	hr = m_audioSessionManager2->GetSessionEnumerator(&audioSessionEnumerator);
+	if (SUCCEEDED(hr))
+	{
+		int nSessionCount;
+		hr = audioSessionEnumerator->GetCount(&nSessionCount);
+		for (int n = 0; n < nSessionCount; n++)
+		{
+			hr = audioSessionEnumerator->GetSession(n, &audioSessionControl);
+			if (SUCCEEDED(hr))
+			{
+				hr = audioSessionControl->QueryInterface(__uuidof(IAudioSessionControl2), (void**)&audioSessionControl2);
+				if (SUCCEEDED(hr))
+				{
+					DWORD nPID = 0;
+					hr = audioSessionControl2->GetProcessId(&nPID);
+					if (SUCCEEDED(hr))
+					{
+						HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, nPID);
+						if (hProcess != NULL)
+						{
+							WCHAR wsImageName[MAX_PATH + 1];
+							DWORD nSize = MAX_PATH;
+							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
+							{
+								if (wcsstr(wsImageName, i_name) != NULL)
+								{
+									ISimpleAudioVolume* simpleAudioVolume;
+									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
+									if (SUCCEEDED(hr))
+									{
+										hr = simpleAudioVolume->GetMute(o_mute);
 										simpleAudioVolume->Release();
 									}
 								}

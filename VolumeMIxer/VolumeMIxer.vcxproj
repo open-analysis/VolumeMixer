@@ -127,12 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\audio\AudioControl.cpp" />
     <ClCompile Include="src\audio\InputControl.cpp" />
     <ClCompile Include="src\audio\VolumeControl.cpp" />
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\audio\AudioControl.h" />
     <ClInclude Include="src\audio\InputControl.h" />
     <ClInclude Include="src\audio\VolumeControl.h" />
     <ClInclude Include="src\utils\utils.h" />

@@ -11,7 +11,7 @@ void testInputControl()
 	std::vector<std::wstring> names;
 	int temp;
 
-	ic.init();
+	//ic.init();
 
 	ic.getInputStreams(names);
 	for (int i = 0; i < names.size(); i++)
@@ -48,8 +48,6 @@ void testMainVolumeControl()
 	BOOL mute = 1;
 	float volume = 0.0f;
 	std::vector<std::wstring> names;
-
-	vc.init();
 
 	/*vc.getMute(L"Spotify", &mute);
 	printf("\tMute state: %d\n", mute);

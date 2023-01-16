@@ -16,6 +16,8 @@ void AudioControl::init(EDataFlow dataFlow, ERole role)
 		if (SUCCEEDED(hr))
 		{
 			hr = m_deviceEnumerator->GetDefaultAudioEndpoint(dataFlow, role, &m_device);
+			std::wcout << "Device: " << m_device << std::endl;
+			std::wcout << "Type: " << typeid(m_device).name() << std::endl;
 			if (SUCCEEDED(hr))
 			{
 				hr = m_device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (VOID**)&m_audioSessionManager2);
@@ -36,6 +38,42 @@ void AudioControl::destroy()
 	m_deviceEnumerator->Release();
 	CoUninitialize();
 }
+
+
+void AudioControl::getDevices()
+{
+	IMMDeviceEnumerator* deviceEnumerator = NULL;
+	IMMDevice* device = NULL;
+	IAudioSessionManager2* audioSessionManager2 = NULL;
+	IMMDeviceCollection* deviceCollection = NULL;
+
+	HRESULT hr = CoInitialize(NULL);
+	if (SUCCEEDED(hr))
+	{
+		std::cout << "Initialized" << std::endl;
+		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&deviceEnumerator);
+		if (SUCCEEDED(hr))
+		{
+			std::cout << "Created instance" << std::endl;
+			hr = deviceEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, (IMMDeviceCollection**)deviceCollection);
+			if (SUCCEEDED(hr))
+			{
+				if (deviceCollection != NULL)
+				{
+					std::cout << "Enumerated devices" << std::endl;
+					std::wcout << "Devices: " << deviceCollection << std::endl;
+					std::wcout << "Type: " << typeid(deviceCollection).name() << std::endl;
+				}
+			}
+			std::cout << "Done enumerating devices" << std::endl;
+		}
+	}
+	deviceCollection->Release();
+	deviceEnumerator->Release();
+	CoUninitialize();
+
+}
+
 
 void AudioControl::toggleMute(const WCHAR* i_name)
 {

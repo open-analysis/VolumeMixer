@@ -8,6 +8,8 @@
 #include <Mmdeviceapi.h>
 #include <vector>
 
+#include <iostream>
+
 #include "../utils/utils.h"
 
 class AudioControl
@@ -25,6 +27,8 @@ public:
 
 	void init(EDataFlow, ERole);
 	void destroy();
+
+	void getDevices();
 
 	void toggleMute(const WCHAR*);
 	void setMute(const WCHAR*, const BOOL*);

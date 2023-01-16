@@ -1,6 +1,6 @@
-#include "MainVolumeControl.h"
+#include "VolumeControl.h"
 
-MainVolumeControl::MainVolumeControl()
+VolumeControl::VolumeControl()
 {
 	m_deviceEnumerator = NULL;
 	m_device = NULL;
@@ -8,7 +8,7 @@ MainVolumeControl::MainVolumeControl()
 }
 
 
-void MainVolumeControl::init()
+void VolumeControl::init()
 {
 	HRESULT hr = CoInitialize(NULL);
 	if (SUCCEEDED(hr))
@@ -29,7 +29,65 @@ void MainVolumeControl::init()
 	}
 }
 
-void MainVolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
+void VolumeControl::destroy()
+{
+	// Release the resources
+	m_audioSessionManager2->Release();
+	m_device->Release();
+	m_deviceEnumerator->Release();
+	CoUninitialize();
+}
+
+void VolumeControl::getAudioStreams(std::vector<std::wstring>& o_streams)
+{
+	IAudioSessionEnumerator* audioSessionEnumerator;
+	IAudioSessionControl* audioSessionControl;
+	IAudioSessionControl2* audioSessionControl2;
+	HRESULT hr;
+
+	std::wstring progName;
+	hr = m_audioSessionManager2->GetSessionEnumerator(&audioSessionEnumerator);
+	if (SUCCEEDED(hr))
+	{
+		int nSessionCount;
+		hr = audioSessionEnumerator->GetCount(&nSessionCount);
+		for (int n = 0; n < nSessionCount; n++)
+		{
+			hr = audioSessionEnumerator->GetSession(n, &audioSessionControl);
+			if (SUCCEEDED(hr))
+			{
+				hr = audioSessionControl->QueryInterface(__uuidof(IAudioSessionControl2), (void**)&audioSessionControl2);
+				if (SUCCEEDED(hr))
+				{
+					DWORD nPID = 0;
+					hr = audioSessionControl2->GetProcessId(&nPID);
+					if (SUCCEEDED(hr))
+					{
+						HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, nPID);
+						if (hProcess != NULL)
+						{
+							WCHAR wsImageName[MAX_PATH + 1];
+							DWORD nSize = MAX_PATH;
+							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
+							{
+								//printf("\nImage: %ls\n", wsImageName);
+								progName = util.extractName(wsImageName);
+								//std::wcout << "Prog: " << progName << std::endl;
+								o_streams.push_back(progName);
+							}
+							CloseHandle(hProcess);
+						}
+					}
+					audioSessionControl2->Release();
+				}
+			}
+			audioSessionControl->Release();
+		}
+		audioSessionEnumerator->Release();
+	}
+}
+
+void VolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -84,7 +142,7 @@ void MainVolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
 	}
 }
 
-void MainVolumeControl::getVolume(const WCHAR* i_name, float* o_level)
+void VolumeControl::getVolume(const WCHAR* i_name, float* o_level)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -139,7 +197,7 @@ void MainVolumeControl::getVolume(const WCHAR* i_name, float* o_level)
 	}
 }
 
-void MainVolumeControl::toggleMute(const WCHAR* i_name)
+void VolumeControl::toggleMute(const WCHAR* i_name)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -151,7 +209,6 @@ void MainVolumeControl::toggleMute(const WCHAR* i_name)
 	{
 		int nSessionCount;
 		hr = audioSessionEnumerator->GetCount(&nSessionCount);
-		printf("Cycling process names %d times\n", nSessionCount);
 		for (int n = 0; n < nSessionCount; n++)
 		{
 			hr = audioSessionEnumerator->GetSession(n, &audioSessionControl);
@@ -167,16 +224,13 @@ void MainVolumeControl::toggleMute(const WCHAR* i_name)
 						HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, nPID);
 						if (hProcess != NULL)
 						{
-							printf("\t\tGot process ID %d\n", nPID);
 							WCHAR wsImageName[MAX_PATH + 1];
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
-								printf("Name: %ls\n", wsImageName);
 								//   v gets the substring
 								if (wcsstr(wsImageName, i_name) != NULL)
 								{
-									printf("Found: %ls\n", wsImageName);
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
 									if (SUCCEEDED(hr))
@@ -200,7 +254,62 @@ void MainVolumeControl::toggleMute(const WCHAR* i_name)
 	}
 }
 
-void MainVolumeControl::getMute(const WCHAR *i_name, BOOL* o_mute)
+void VolumeControl::setMute(const WCHAR* i_name, const BOOL* i_mute)
+{
+	IAudioSessionEnumerator* audioSessionEnumerator;
+	IAudioSessionControl* audioSessionControl;
+	IAudioSessionControl2* audioSessionControl2;
+	HRESULT hr;
+
+	hr = m_audioSessionManager2->GetSessionEnumerator(&audioSessionEnumerator);
+	if (SUCCEEDED(hr))
+	{
+		int nSessionCount;
+		hr = audioSessionEnumerator->GetCount(&nSessionCount);
+		for (int n = 0; n < nSessionCount; n++)
+		{
+			hr = audioSessionEnumerator->GetSession(n, &audioSessionControl);
+			if (SUCCEEDED(hr))
+			{
+				hr = audioSessionControl->QueryInterface(__uuidof(IAudioSessionControl2), (void**)&audioSessionControl2);
+				if (SUCCEEDED(hr))
+				{
+					DWORD nPID = 0;
+					hr = audioSessionControl2->GetProcessId(&nPID);
+					if (SUCCEEDED(hr))
+					{
+						HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, nPID);
+						if (hProcess != NULL)
+						{
+							WCHAR wsImageName[MAX_PATH + 1];
+							DWORD nSize = MAX_PATH;
+							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
+							{
+								//   v gets the substring
+								if (wcsstr(wsImageName, i_name) != NULL)
+								{
+									ISimpleAudioVolume* simpleAudioVolume;
+									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
+									if (SUCCEEDED(hr))
+									{
+										hr = simpleAudioVolume->SetMute(*i_mute, NULL);
+										simpleAudioVolume->Release();
+									}
+								}
+							}
+							CloseHandle(hProcess);
+						}
+					}
+					audioSessionControl2->Release();
+				}
+			}
+			audioSessionControl->Release();
+		}
+		audioSessionEnumerator->Release();
+	}
+}
+
+void VolumeControl::getMute(const WCHAR *i_name, BOOL* o_mute)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -251,125 +360,4 @@ void MainVolumeControl::getMute(const WCHAR *i_name, BOOL* o_mute)
 		}
 		audioSessionEnumerator->Release();
 	}
-}
-
-void MainVolumeControl::destroy()
-{
-	// Release the resources
-	m_audioSessionManager2->Release();
-	m_device->Release();
-	m_deviceEnumerator->Release();
-	CoUninitialize();
-}
-
-void MainVolumeControl::getAudioStreams(std::vector<std::wstring>& o_streams)
-{
-	IAudioSessionEnumerator* audioSessionEnumerator;
-	IAudioSessionControl* audioSessionControl;
-	IAudioSessionControl2* audioSessionControl2;
-	HRESULT hr;
-
-	std::wstring progName;
-	hr = m_audioSessionManager2->GetSessionEnumerator(&audioSessionEnumerator);
-	if (SUCCEEDED(hr))
-	{
-		int nSessionCount;
-		hr = audioSessionEnumerator->GetCount(&nSessionCount);
-		for (int n = 0; n < nSessionCount; n++)
-		{
-			hr = audioSessionEnumerator->GetSession(n, &audioSessionControl);
-			if (SUCCEEDED(hr))
-			{
-				hr = audioSessionControl->QueryInterface(__uuidof(IAudioSessionControl2), (void**)&audioSessionControl2);
-				if (SUCCEEDED(hr))
-				{
-					DWORD nPID = 0;
-					hr = audioSessionControl2->GetProcessId(&nPID);
-					if (SUCCEEDED(hr))
-					{
-						HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, nPID);
-						if (hProcess != NULL)
-						{
-							WCHAR wsImageName[MAX_PATH + 1];
-							DWORD nSize = MAX_PATH;
-							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
-							{
-								/*printf("\nImage: %ls\n", wsImageName);
-								progName = extractName(wsImageName);
-								std::wcout << "Prog: " << progName << std::endl;*/
-								o_streams.push_back(progName);
-							}
-							CloseHandle(hProcess);
-						}
-					}
-					audioSessionControl2->Release();
-				}
-			}
-			audioSessionControl->Release();
-		}
-		audioSessionEnumerator->Release();
-	}
-}
-
-void MainVolumeControl::check(HRESULT hr)
-{
-	if (hr != S_OK)
-	{
-		//printf(errMsg);
-		printf("Failed\n");
-		printf("Error Code: 0x%08lx\n", hr);
-		CoUninitialize();
-		exit(-1);
-	}
-}
-
-std::wstring MainVolumeControl::extractName(WCHAR i_imageName[])
-{
-	constexpr u_int LEN_IMAGE_MAX = MAX_PATH + 1;
-	std::wstring o_progName;
-
-	u_int endImage = 0; // Starting just before the .exe of the path
-	u_int startExe = 0; // Starting just before the .exe of the path
-	u_int startProg = endImage;
-	u_int lenImage = 0;
-	u_int lenProg = 0;
-	u_int check = 0;
-
-	// Start by finding the end of the path
-	for (u_int i = 0; i < LEN_IMAGE_MAX; i++)
-	{
-		if ((check == 0) && (i_imageName[i] == L'.')) check++;
-		else if ((check == 1) && (i_imageName[i] == L'e')) check++;
-		else if ((check == 2) && (i_imageName[i] == L'x')) check++;
-		else if ((check == 3) && (i_imageName[i] == L'e'))
-		{
-			endImage = i;
-			startProg = endImage - 4;
-			startExe = endImage - 3;
-			break;
-		}
-		else
-		{
-			check = 0;
-		}
-	}
-
-	// Find the starting character location the program name
-	//  and gets the length of the name
-	while (i_imageName[startProg] != L'\\')
-	{
-		lenProg++;
-		startProg--;
-	}
-	
-	startProg++;
-	lenProg--;
-
-	for (u_int i = startProg; i < startExe; i++)
-	{
-		o_progName += i_imageName[i];
-	}
-
-	return o_progName;
-
 }

@@ -43,8 +43,6 @@ void AudioControl::destroy()
 void AudioControl::getDevices()
 {
 	IMMDeviceEnumerator* deviceEnumerator = NULL;
-	IMMDevice* device = NULL;
-	IAudioSessionManager2* audioSessionManager2 = NULL;
 	IMMDeviceCollection* deviceCollection = NULL;
 
 	HRESULT hr = CoInitialize(NULL);
@@ -75,7 +73,7 @@ void AudioControl::getDevices()
 }
 
 
-void AudioControl::toggleMute(const WCHAR* i_name)
+void AudioControl::toggleMute(const std::wstring* i_name)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -106,8 +104,9 @@ void AudioControl::toggleMute(const WCHAR* i_name)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
+								const WCHAR* TEMP_NAME = i_name->c_str();
 								//   v gets the substring
-								if (wcsstr(wsImageName, i_name) != NULL)
+								if (wcsstr(wsImageName, TEMP_NAME) != NULL)
 								{
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
@@ -132,7 +131,7 @@ void AudioControl::toggleMute(const WCHAR* i_name)
 	}
 }
 
-void AudioControl::setMute(const WCHAR* i_name, const BOOL* i_mute)
+void AudioControl::setMute(const std::wstring* i_name, const BOOL* i_mute)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -163,8 +162,9 @@ void AudioControl::setMute(const WCHAR* i_name, const BOOL* i_mute)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
+								const WCHAR* TEMP_NAME = i_name->c_str();
 								//   v gets the substring
-								if (wcsstr(wsImageName, i_name) != NULL)
+								if (wcsstr(wsImageName, TEMP_NAME) != NULL)
 								{
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
@@ -187,7 +187,7 @@ void AudioControl::setMute(const WCHAR* i_name, const BOOL* i_mute)
 	}
 }
 
-void AudioControl::getMute(const WCHAR* i_name, BOOL* o_mute)
+void AudioControl::getMute(const std::wstring* i_name, BOOL* o_mute)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -217,7 +217,8 @@ void AudioControl::getMute(const WCHAR* i_name, BOOL* o_mute)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
-								if (wcsstr(wsImageName, i_name) != NULL)
+								const WCHAR* TEMP_NAME = i_name->c_str();
+								if (wcsstr(wsImageName, TEMP_NAME) != NULL)
 								{
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);

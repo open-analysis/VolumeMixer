@@ -54,7 +54,7 @@ void VolumeControl::getAudioStreams(std::vector<std::wstring>& o_streams)
 	}
 }
 
-void VolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
+void VolumeControl::setVolume(const std::wstring* i_name, const float* i_volume)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -85,8 +85,9 @@ void VolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
+								const WCHAR* TEMP_NAME = i_name->c_str();
 								//   v gets the substring
-								if (wcsstr(wsImageName, i_name) != NULL)
+								if (wcsstr(wsImageName, TEMP_NAME) != NULL)
 								{
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
@@ -109,7 +110,7 @@ void VolumeControl::setVolume(const WCHAR* i_name, const float* i_volume)
 	}
 }
 
-void VolumeControl::getVolume(const WCHAR* i_name, float* o_level)
+void VolumeControl::getVolume(const std::wstring* i_name, float* o_level)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -140,8 +141,9 @@ void VolumeControl::getVolume(const WCHAR* i_name, float* o_level)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
+								const WCHAR* TEMP_NAME = i_name->c_str();
 								//   v gets the substring
-								if (wcsstr(wsImageName, i_name) != NULL)
+								if (wcsstr(wsImageName, TEMP_NAME) != NULL)
 								{
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
@@ -162,4 +164,34 @@ void VolumeControl::getVolume(const WCHAR* i_name, float* o_level)
 		}
 		audioSessionEnumerator->Release();
 	}
+}
+
+void VolumeControl::muteAll()
+{
+	constexpr BOOL MUTE = true;
+	std::vector<std::wstring> inputs;
+
+	getAudioStreams(inputs);
+
+	for (auto prog : inputs)
+	{
+		AudioControl::setMute(&prog, &MUTE);
+	}
+
+	inputs.clear();
+}
+
+void VolumeControl::unmuteAll()
+{
+	constexpr BOOL MUTE = false;
+	std::vector<std::wstring> inputs;
+
+	getAudioStreams(inputs);
+
+	for (auto prog : inputs)
+	{
+		AudioControl::setMute(&prog, &MUTE);
+	}
+
+	inputs.clear();
 }

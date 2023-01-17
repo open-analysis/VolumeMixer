@@ -19,6 +19,9 @@ public:
 
 	void getInputStreams(std::vector<std::wstring>&);
 
-	void setBoost(const WCHAR*, const float*);
-	void getBoost(const WCHAR*, float*);
+	void setBoost(const std::wstring*, const float*);
+	void getBoost(const std::wstring*, float*);
+
+	void muteAll();
+	void unmuteAll();
 };

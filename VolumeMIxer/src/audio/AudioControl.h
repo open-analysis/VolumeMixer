@@ -30,8 +30,10 @@ public:
 
 	void getDevices();
 
-	void toggleMute(const WCHAR*);
-	void setMute(const WCHAR*, const BOOL*);
-	void getMute(const WCHAR*, BOOL*);
+	void toggleMute(const std::wstring*);
+	void setMute(const std::wstring*, const BOOL*);
+	void getMute(const std::wstring*, BOOL*);
+	virtual void muteAll() = 0;
+	virtual void unmuteAll() = 0;
 
 };

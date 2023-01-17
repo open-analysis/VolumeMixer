@@ -54,7 +54,7 @@ void InputControl::getInputStreams(std::vector<std::wstring>& o_streams)
 	}
 }
 
-void InputControl::setBoost(const WCHAR* i_name, const float* i_volume)
+void InputControl::setBoost(const std::wstring* i_name, const float* i_volume)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -109,7 +109,7 @@ void InputControl::setBoost(const WCHAR* i_name, const float* i_volume)
 	}
 }
 
-void InputControl::getBoost(const WCHAR* i_name, float* o_level)
+void InputControl::getBoost(const std::wstring* i_name, float* o_level)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -162,4 +162,34 @@ void InputControl::getBoost(const WCHAR* i_name, float* o_level)
 		}
 		audioSessionEnumerator->Release();
 	}
+}
+
+void InputControl::muteAll()
+{
+	constexpr BOOL MUTE = true;
+	std::vector<std::wstring> inputs;
+
+	getInputStreams(inputs);
+
+	for (auto prog : inputs)
+	{
+		AudioControl::setMute(&prog, &MUTE);
+	}
+
+	inputs.clear();
+}
+
+void InputControl::unmuteAll()
+{
+	constexpr BOOL MUTE = false;
+	std::vector<std::wstring> inputs;
+
+	getInputStreams(inputs);
+
+	for (auto prog : inputs)
+	{
+		AudioControl::setMute(&prog, &MUTE);
+	}
+
+	inputs.clear();
 }

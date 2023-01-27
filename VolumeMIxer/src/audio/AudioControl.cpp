@@ -5,10 +5,15 @@ AudioControl::AudioControl()
 	m_deviceEnumerator = NULL;
 	m_device = NULL;
 	m_audioSessionManager2 = NULL;
+	m_eDataFlow = eRender;
+	m_eRole = eConsole;
 }
 
 void AudioControl::init(EDataFlow dataFlow, ERole role)
 {
+	m_eDataFlow = dataFlow;
+	m_eRole = role;
+
 	HRESULT hr = CoInitialize(NULL);
 	if (SUCCEEDED(hr))
 	{
@@ -16,8 +21,6 @@ void AudioControl::init(EDataFlow dataFlow, ERole role)
 		if (SUCCEEDED(hr))
 		{
 			hr = m_deviceEnumerator->GetDefaultAudioEndpoint(dataFlow, role, &m_device);
-			std::wcout << "Device: " << m_device << std::endl;
-			std::wcout << "Type: " << typeid(m_device).name() << std::endl;
 			if (SUCCEEDED(hr))
 			{
 				hr = m_device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (VOID**)&m_audioSessionManager2);
@@ -39,39 +42,63 @@ void AudioControl::destroy()
 	CoUninitialize();
 }
 
-
-void AudioControl::getDevices()
+bool AudioControl::GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint)
 {
-	IMMDeviceEnumerator* deviceEnumerator = NULL;
-	IMMDeviceCollection* deviceCollection = NULL;
+	constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
+	constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
 
-	HRESULT hr = CoInitialize(NULL);
-	if (SUCCEEDED(hr))
-	{
-		std::cout << "Initialized" << std::endl;
-		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&deviceEnumerator);
-		if (SUCCEEDED(hr))
-		{
-			std::cout << "Created instance" << std::endl;
-			hr = deviceEnumerator->EnumAudioEndpoints(eRender, DEVICE_STATE_ACTIVE, (IMMDeviceCollection**)deviceCollection);
-			if (SUCCEEDED(hr))
-			{
-				if (deviceCollection != NULL)
-				{
-					std::cout << "Enumerated devices" << std::endl;
-					std::wcout << "Devices: " << deviceCollection << std::endl;
-					std::wcout << "Type: " << typeid(deviceCollection).name() << std::endl;
-				}
-			}
-			std::cout << "Done enumerating devices" << std::endl;
+	IMMDeviceEnumerator* spEnumerator;
+	if (FAILED(CoCreateInstance(
+		CLSID_MMDeviceEnumerator, NULL,
+		CLSCTX_ALL, IID_IMMDeviceEnumerator,
+		(void**)&spEnumerator)))
+		return false;
+
+
+	IMMDeviceCollection* spCollection;
+	if (FAILED(spEnumerator->EnumAudioEndpoints(m_eDataFlow, DEVICE_STATE_ACTIVE, &spCollection)))
+		return false;
+
+	std::wstring defaultDevID;
+	IMMDevice* spDefaultDevice;
+	if (SUCCEEDED(spEnumerator->GetDefaultAudioEndpoint(m_eDataFlow, m_eRole, &spDefaultDevice))) {
+		LPWSTR id;
+		if (SUCCEEDED(spDefaultDevice->GetId(&id))) {
+			defaultDevID = id;
+			::CoTaskMemFree(id);
 		}
 	}
-	deviceCollection->Release();
-	deviceEnumerator->Release();
-	CoUninitialize();
 
+	UINT nCount = 0;
+	spCollection->GetCount(&nCount);
+	for (UINT i = 0; i < nCount; ++i) {
+		IMMDevice* spDevice;
+		spCollection->Item(i, &spDevice);
+		if (spDevice) {
+			EndPointData	data;
+			LPWSTR id;
+			if (SUCCEEDED(spDevice->GetId(&id))) {
+				data.devID = id;
+				::CoTaskMemFree(id);
+				if (data.devID == defaultDevID)
+					data.bDefault = true;
+			}
+
+			IPropertyStore* spProperty;
+			spDevice->OpenPropertyStore(STGM_READ, &spProperty);
+			if (spProperty) {
+				PROPVARIANT	varName;
+				PropVariantInit(&varName);
+				if (SUCCEEDED(spProperty->GetValue(PKEY_Device_FriendlyName, &varName)))
+					data.name = varName.pwszVal;
+				PropVariantClear(&varName);
+			}
+			vecEndPoint.push_back(data);
+		}
+	}
+
+	return true;
 }
-
 
 void AudioControl::toggleMute(const std::wstring* i_name)
 {

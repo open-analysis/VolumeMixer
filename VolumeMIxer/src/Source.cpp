@@ -1,7 +1,10 @@
+#include <string>
 #include <vector>
 #include <iostream>
 #include "audio/VolumeControl.h"
 #include "audio/InputControl.h"
+#include "audio/AudioControl.h"
+#include "audio/EndPointData.h"
 
 void testInputControl()
 {
@@ -26,23 +29,25 @@ void testInputControl()
 	//printf("Toggling Discord\n");
 	//ic.toggleMute(L"Discord");
 
-	ic.getBoost(L"Discord", &boost);
-	printf("\Boost: %f\n", boost);
-	boost = .20f;
+	std::wstring disc = L"Discord";
+
+	ic.getBoost(&disc, &boost);
+	printf("Boost: %f\n", boost);
+	boost = .50f;
 	printf("Seting Discord boost: %f\n", boost);
-	ic.setBoost(L"Discord", &boost);
+	ic.setBoost(&disc, &boost);
 
 	std::cout << "reset boost [Enter]" << std::endl;
 	std::cin >> temp;
 
 	boost = 1.0f;
 	printf("Seting Discord boost: %f\n", boost);
-	ic.setBoost(L"Discord", &boost);
+	ic.setBoost(&disc, &boost);
 
 	ic.destroy();
 }
 
-void testMainVolumeControl()
+void testVolumeControl()
 {
 	VolumeControl vc;
 	BOOL mute = 1;
@@ -65,13 +70,47 @@ void testMainVolumeControl()
 	vc.destroy();
 }
 
+void testAudioControl()
+{
+	VolumeControl vc;
+	std::vector<EndPointData> endPoints;
+
+	std::cout << "Getting volume endpoints" << std::endl;
+	vc.GetEndPointDeviceData(endPoints);
+	for (auto elem : endPoints)
+	{
+		std::wcout << elem.devID << std::endl;
+		std::wcout << "\t" << elem.name << std::endl;
+		std::wcout << "\t" << elem.bDefault << std::endl;
+
+	}
+
+	endPoints.clear();
+	InputControl ic;
+	std::cout << "Getting input endpoints" << std::endl;
+	ic.GetEndPointDeviceData(endPoints);
+	for (auto elem : endPoints)
+	{
+		std::wcout << elem.devID << std::endl;
+		std::wcout << "\t" << elem.name << std::endl;
+		std::wcout << "\t" << elem.bDefault << std::endl;
+
+	}
+
+}
+
 int main(int argc, CHAR* argv[])
 {
 	/*printf("Testing Volume Control\n");
-	testMainVolumeControl();*/
+	testVolumeControl();*/
 
-	std::cout << "\n\nTesting input control" << std::endl;
-	testInputControl();
+	std::cout << "Testing Audio Control" << std::endl;
+	testAudioControl();
+
+	/*std::cout << "\n\nTesting input control" << std::endl;
+	testInputControl();*/
+	
+	printf("\n\n\nDone\n");
 
 	return 0;
 }

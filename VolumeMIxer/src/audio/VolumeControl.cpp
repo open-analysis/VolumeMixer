@@ -1,4 +1,6 @@
-#include "VolumeControl.h"
+﻿#include "VolumeControl.h"
+
+using namespace std;
 
 VolumeControl::VolumeControl()
 {

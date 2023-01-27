@@ -47,23 +47,31 @@ bool AudioControl::GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint)
 	constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
 
+	HRESULT hr;
+
 	IMMDeviceEnumerator* spEnumerator;
-	if (FAILED(CoCreateInstance(
+	hr = CoCreateInstance(
 		CLSID_MMDeviceEnumerator, NULL,
 		CLSCTX_ALL, IID_IMMDeviceEnumerator,
-		(void**)&spEnumerator)))
+		(void**)&spEnumerator);
+	if (FAILED(hr))
 		return false;
 
 
 	IMMDeviceCollection* spCollection;
-	if (FAILED(spEnumerator->EnumAudioEndpoints(m_eDataFlow, DEVICE_STATE_ACTIVE, &spCollection)))
+	hr = spEnumerator->EnumAudioEndpoints(m_eDataFlow, DEVICE_STATE_ACTIVE, &spCollection);
+	if (FAILED(hr))
 		return false;
 
 	std::wstring defaultDevID;
 	IMMDevice* spDefaultDevice;
-	if (SUCCEEDED(spEnumerator->GetDefaultAudioEndpoint(m_eDataFlow, m_eRole, &spDefaultDevice))) {
+	hr = spEnumerator->GetDefaultAudioEndpoint(m_eDataFlow, m_eRole, &spDefaultDevice);
+	if (SUCCEEDED(hr)) 
+	{
 		LPWSTR id;
-		if (SUCCEEDED(spDefaultDevice->GetId(&id))) {
+		hr = spDefaultDevice->GetId(&id);
+		if (SUCCEEDED(hr)) 
+		{
 			defaultDevID = id;
 			::CoTaskMemFree(id);
 		}
@@ -71,29 +79,39 @@ bool AudioControl::GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint)
 
 	UINT nCount = 0;
 	spCollection->GetCount(&nCount);
-	for (UINT i = 0; i < nCount; ++i) {
+	for (UINT i = 0; i < nCount; ++i) 
+	{
 		IMMDevice* spDevice;
-		spCollection->Item(i, &spDevice);
-		if (spDevice) {
-			EndPointData	data;
-			LPWSTR id;
-			if (SUCCEEDED(spDevice->GetId(&id))) {
-				data.devID = id;
-				::CoTaskMemFree(id);
-				if (data.devID == defaultDevID)
-					data.bDefault = true;
+		hr = spCollection->Item(i, &spDevice);
+		if (SUCCEEDED(hr))
+		{
+			if (spDevice) 
+			{
+				EndPointData data;
+				LPWSTR id;
+				hr = spDevice->GetId(&id);
+				if (SUCCEEDED(hr)) 
+				{
+					data.devID = id;
+					::CoTaskMemFree(id);
+					if (data.devID == defaultDevID)
+						data.bDefault = true;
+				}
+
+				IPropertyStore* spProperty;
+				spDevice->OpenPropertyStore(STGM_READ, &spProperty);
+				if (spProperty) 
+				{
+					PROPVARIANT	varName;
+					PropVariantInit(&varName);
+					hr = spProperty->GetValue(PKEY_Device_FriendlyName, &varName);
+					if (SUCCEEDED(hr))
+						data.name = varName.pwszVal;
+					PropVariantClear(&varName);
+				}
+				vecEndPoint.push_back(data);
 			}
 
-			IPropertyStore* spProperty;
-			spDevice->OpenPropertyStore(STGM_READ, &spProperty);
-			if (spProperty) {
-				PROPVARIANT	varName;
-				PropVariantInit(&varName);
-				if (SUCCEEDED(spProperty->GetValue(PKEY_Device_FriendlyName, &varName)))
-					data.name = varName.pwszVal;
-				PropVariantClear(&varName);
-			}
-			vecEndPoint.push_back(data);
 		}
 	}
 

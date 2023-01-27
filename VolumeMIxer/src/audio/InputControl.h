@@ -1,15 +1,6 @@
 #pragma once
 
-#include <cstdio>
-#include <windows.h>
-#include <audioclient.h>
-#include <audiopolicy.h>
-#include <Mmdeviceapi.h>
-#include <vector>
-#include <string>
-
 #include "AudioControl.h"
-#include "../utils/utils.h"
 
 class InputControl : public AudioControl
 {

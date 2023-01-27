@@ -6,11 +6,14 @@
 #include <audioclient.h>
 #include <audiopolicy.h>
 #include <Mmdeviceapi.h>
+#include <functiondiscoverykeys_devpkey.h>
 #include <vector>
 
-#include <iostream>
-
 #include "../utils/utils.h"
+#include "EndPointData.h"
+
+typedef __MIDL___MIDL_itf_mmdeviceapi_0000_0000_0002 role;
+typedef __MIDL___MIDL_itf_mmdeviceapi_0000_0000_0001 dataFlow;
 
 class AudioControl
 {
@@ -18,6 +21,8 @@ protected:
 	IMMDeviceEnumerator* m_deviceEnumerator;
 	IMMDevice* m_device;
 	IAudioSessionManager2* m_audioSessionManager2;
+	role m_eRole;
+	dataFlow m_eDataFlow;
 
 	utils util;
 
@@ -27,8 +32,10 @@ public:
 
 	void init(EDataFlow, ERole);
 	void destroy();
-
-	void getDevices();
+	
+	// Thank you to amate for how to get the endpoints
+	//  https://github.com/amate/SetDefaultAudioDevice
+	bool GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);
 
 	void toggleMute(const std::wstring*);
 	void setMute(const std::wstring*, const BOOL*);

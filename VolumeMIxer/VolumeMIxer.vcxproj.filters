@@ -44,5 +44,8 @@
     <ClInclude Include="src\audio\AudioControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\audio\EndPointData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

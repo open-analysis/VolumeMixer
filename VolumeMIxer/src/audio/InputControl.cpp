@@ -85,8 +85,9 @@ void InputControl::setBoost(const std::wstring* i_name, const float* i_volume)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
+								const WCHAR* TEMP_NAME = i_name->c_str();
 								//   v gets the substring
-								if (wcsstr(wsImageName, i_name) != NULL)
+								if (wcsstr(wsImageName, TEMP_NAME) != NULL)
 								{
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
@@ -140,8 +141,9 @@ void InputControl::getBoost(const std::wstring* i_name, float* o_level)
 							DWORD nSize = MAX_PATH;
 							if (QueryFullProcessImageNameW(hProcess, NULL, wsImageName, &nSize))
 							{
+								const WCHAR* TEMP_NAME = i_name->c_str();
 								//   v gets the substring
-								if (wcsstr(wsImageName, i_name) != NULL)
+								if (wcsstr(wsImageName, TEMP_NAME) != NULL)
 								{
 									ISimpleAudioVolume* simpleAudioVolume;
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);

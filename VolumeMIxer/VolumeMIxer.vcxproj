@@ -134,6 +134,7 @@
     <ClCompile Include="src\utils\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\audio\EndPointData.h" />
     <ClInclude Include="src\audio\AudioControl.h" />
     <ClInclude Include="src\audio\InputControl.h" />
     <ClInclude Include="src\audio\VolumeControl.h" />

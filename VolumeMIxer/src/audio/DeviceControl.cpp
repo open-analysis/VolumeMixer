@@ -46,7 +46,7 @@ void DeviceControl::destroy()
 	CoUninitialize();
 }
 
-void DeviceControl::GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint)
+void DeviceControl::getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint)
 {
 	constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
@@ -122,9 +122,53 @@ void DeviceControl::GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint
 	return;
 }
 
-void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName)
+void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role* i_role)
 {
-	return;
+	std::vector<EndPointData> spEndPoints;
+	IPolicyConfig* spPolicyConfig = nullptr;
+	LPCWSTR devId = NULL;
+
+	HRESULT hr = CoCreateInstance(__uuidof(CPolicyConfigClient), NULL, CLSCTX_ALL, __uuidof(IPolicyConfig), (LPVOID*)&spPolicyConfig);
+	if (spPolicyConfig == nullptr) {
+		hr = CoCreateInstance(__uuidof(CPolicyConfigClient), NULL, CLSCTX_ALL, __uuidof(IPolicyConfig10), (LPVOID*)&spPolicyConfig);
+	}
+	if (spPolicyConfig == nullptr) {
+		hr = CoCreateInstance(__uuidof(CPolicyConfigClient), NULL, CLSCTX_ALL, __uuidof(IPolicyConfig7), (LPVOID*)&spPolicyConfig);
+	}
+	if (spPolicyConfig == nullptr) {
+		hr = CoCreateInstance(__uuidof(CPolicyConfigClient), NULL, CLSCTX_ALL, __uuidof(IPolicyConfigVista), (LPVOID*)&spPolicyConfig);
+	}
+	if (spPolicyConfig == nullptr) {
+		hr = CoCreateInstance(__uuidof(CPolicyConfigClient), NULL, CLSCTX_ALL, __uuidof(IPolicyConfig10_1), (LPVOID*)&spPolicyConfig);
+	}
+
+	getEndPointDeviceData(spEndPoints);
+
+	const WCHAR* i_devName_c = i_devName->c_str();
+	for (auto& elem : spEndPoints)
+	{
+		const WCHAR* elem_name_c = elem.name.c_str();
+
+		if (!wcscmp(elem_name_c, i_devName_c))
+		{
+			std::wcout << L"Found endpoint " << elem_name_c << std::endl;
+			devId = elem.devID.c_str();
+			std::wcout << L"DevID: " << devId << std::endl;
+			std::wcout << L"Elem ID: " << elem.devID << std::endl;
+			break;
+		}
+	}
+	std::wcout << L"DevID: " << devId << std::endl;
+
+	if (spPolicyConfig != NULL) {
+		if (devId != NULL)
+		{
+			std::cout << "Setting default endpoint" << std::endl;
+			hr = spPolicyConfig->SetDefaultEndpoint(devId, *i_role);
+			SAFE_RELEASE(spPolicyConfig);
+		}
+	}
+
 }
 
 void DeviceControl::toggleDeviceMute(const std::wstring* i_devName)

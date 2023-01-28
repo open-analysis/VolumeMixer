@@ -11,7 +11,7 @@
 
 #include "../utils/utils.h"
 #include "../utils/EndPointData.h"
-
+#include "../utils/PolicyConfig.h"
 
 class DeviceControl
 {
@@ -33,10 +33,10 @@ public:
 
 	// Thank you to amate for how to get the endpoints
 	//  https://github.com/amate/SetDefaultAudioDevice
-	void GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);
+	void getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);
 	
-	void setDefaultEndpoint(const std::wstring* i_devName);
-	
+	void setDefaultEndpoint(const std::wstring* i_devName, const role* i_role);
+
 	void toggleDeviceMute(const std::wstring* i_devName);
 	void getDeviceMute(const std::wstring* i_devName, BOOL* o_muteState);
 	void setDeviceMute(const std::wstring* i_devName, const BOOL* i_muteState);

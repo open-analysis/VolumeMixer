@@ -10,10 +10,6 @@
 #include <vector>
 
 #include "../utils/utils.h"
-#include "EndPointData.h"
-
-typedef __MIDL___MIDL_itf_mmdeviceapi_0000_0000_0002 role;
-typedef __MIDL___MIDL_itf_mmdeviceapi_0000_0000_0001 dataFlow;
 
 class AudioControl
 {
@@ -32,10 +28,6 @@ public:
 
 	void init(EDataFlow, ERole);
 	void destroy();
-	
-	// Thank you to amate for how to get the endpoints
-	//  https://github.com/amate/SetDefaultAudioDevice
-	bool GetEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);
 
 	void toggleMute(const std::wstring*);
 	void setMute(const std::wstring*, const BOOL*);

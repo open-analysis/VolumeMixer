@@ -30,6 +30,9 @@
     <ClCompile Include="src\audio\AudioControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\audio\DeviceControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\audio\VolumeControl.h">
@@ -44,7 +47,10 @@
     <ClInclude Include="src\audio\AudioControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\audio\EndPointData.h">
+    <ClInclude Include="src\utils\EndPointData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audio\DeviceControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

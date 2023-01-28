@@ -35,6 +35,7 @@ public:
 	//  https://github.com/amate/SetDefaultAudioDevice
 	void getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);
 	
+	// Thanks to EreTIk & amate for figuring this out
 	void setDefaultEndpoint(const std::wstring* i_devName, const role* i_role);
 
 	void toggleDeviceMute(const std::wstring* i_devName);

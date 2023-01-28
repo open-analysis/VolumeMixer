@@ -36,9 +36,9 @@ void AudioControl::init(EDataFlow dataFlow, ERole role)
 void AudioControl::destroy()
 {
 	// Release the resources
-	m_audioSessionManager2->Release();
-	m_device->Release();
-	m_deviceEnumerator->Release();
+	SAFE_RELEASE(m_audioSessionManager2);
+	SAFE_RELEASE(m_device);
+	SAFE_RELEASE(m_deviceEnumerator);
 	CoUninitialize();
 }
 
@@ -84,19 +84,19 @@ void AudioControl::toggleMute(const std::wstring* i_name)
 										BOOL muted;
 										hr = simpleAudioVolume->GetMute(&muted);
 										hr = simpleAudioVolume->SetMute(!muted, NULL);
-										simpleAudioVolume->Release();
+										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}
 							}
 							CloseHandle(hProcess);
 						}
 					}
-					audioSessionControl2->Release();
+					SAFE_RELEASE(audioSessionControl2);
 				}
 			}
-			audioSessionControl->Release();
+			SAFE_RELEASE(audioSessionControl);
 		}
-		audioSessionEnumerator->Release();
+		SAFE_RELEASE(audioSessionEnumerator);
 	}
 }
 
@@ -140,19 +140,19 @@ void AudioControl::setMute(const std::wstring* i_name, const BOOL* i_mute)
 									if (SUCCEEDED(hr))
 									{
 										hr = simpleAudioVolume->SetMute(*i_mute, NULL);
-										simpleAudioVolume->Release();
+										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}
 							}
 							CloseHandle(hProcess);
 						}
 					}
-					audioSessionControl2->Release();
+					SAFE_RELEASE(audioSessionControl2);
 				}
 			}
-			audioSessionControl->Release();
+			SAFE_RELEASE(audioSessionControl);
 		}
-		audioSessionEnumerator->Release();
+		SAFE_RELEASE(audioSessionEnumerator);
 	}
 }
 
@@ -194,18 +194,18 @@ void AudioControl::getMute(const std::wstring* i_name, BOOL* o_mute)
 									if (SUCCEEDED(hr))
 									{
 										hr = simpleAudioVolume->GetMute(o_mute);
-										simpleAudioVolume->Release();
+										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}
 							}
 							CloseHandle(hProcess);
 						}
 					}
-					audioSessionControl2->Release();
+					SAFE_RELEASE(audioSessionControl2);
 				}
 			}
-			audioSessionControl->Release();
+			SAFE_RELEASE(audioSessionControl);
 		}
-		audioSessionEnumerator->Release();
+		SAFE_RELEASE(audioSessionEnumerator);
 	}
 }

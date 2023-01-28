@@ -140,6 +140,7 @@
     <ClInclude Include="src\audio\AudioControl.h" />
     <ClInclude Include="src\audio\InputControl.h" />
     <ClInclude Include="src\audio\VolumeControl.h" />
+    <ClInclude Include="src\utils\PolicyConfig.h" />
     <ClInclude Include="src\utils\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

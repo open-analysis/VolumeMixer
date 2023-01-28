@@ -47,12 +47,12 @@ void VolumeControl::getAudioStreams(std::vector<std::wstring>& o_streams)
 							CloseHandle(hProcess);
 						}
 					}
-					audioSessionControl2->Release();
+					SAFE_RELEASE(audioSessionControl2);
 				}
 			}
-			audioSessionControl->Release();
+			SAFE_RELEASE(audioSessionControl);
 		}
-		audioSessionEnumerator->Release();
+		SAFE_RELEASE(audioSessionEnumerator);
 	}
 }
 
@@ -96,19 +96,19 @@ void VolumeControl::setVolume(const std::wstring* i_name, const float* i_volume)
 									if (SUCCEEDED(hr))
 									{
 										simpleAudioVolume->SetMasterVolume(*i_volume, NULL);
-										simpleAudioVolume->Release();
+										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}
 							}
 							CloseHandle(hProcess);
 						}
 					}
-					audioSessionControl2->Release();
+					SAFE_RELEASE(audioSessionControl2);
 				}
 			}
-			audioSessionControl->Release();
+			SAFE_RELEASE(audioSessionControl);
 		}
-		audioSessionEnumerator->Release();
+		SAFE_RELEASE(audioSessionEnumerator);
 	}
 }
 
@@ -152,19 +152,19 @@ void VolumeControl::getVolume(const std::wstring* i_name, float* o_level)
 									if (SUCCEEDED(hr))
 									{
 										simpleAudioVolume->GetMasterVolume(o_level);
-										simpleAudioVolume->Release();
+										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}
 							}
 							CloseHandle(hProcess);
 						}
 					}
-					audioSessionControl2->Release();
+					SAFE_RELEASE(audioSessionControl2);
 				}
 			}
-			audioSessionControl->Release();
+			SAFE_RELEASE(audioSessionControl);
 		}
-		audioSessionEnumerator->Release();
+		SAFE_RELEASE(audioSessionEnumerator);
 	}
 }
 

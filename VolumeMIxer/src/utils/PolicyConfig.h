@@ -5,6 +5,7 @@
 // @author EreTIk
 // ----------------------------------------------------------------------------
 
+// Thanks to EreTIk & amate for figuring this out
 
 #pragma once
 #include <Mmreg.h>

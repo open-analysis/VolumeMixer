@@ -40,9 +40,9 @@ void DeviceControl::init()
 void DeviceControl::destroy()
 {
 	// Release the resources
-	m_audioSessionManager2->Release();
-	m_device->Release();
-	m_deviceEnumerator->Release();
+	SAFE_RELEASE(m_audioSessionManager2);
+	SAFE_RELEASE(m_device);
+	SAFE_RELEASE(m_deviceEnumerator);
 	CoUninitialize();
 }
 
@@ -234,40 +234,30 @@ void DeviceControl::getDeviceMute(const std::wstring* i_devName, BOOL* o_muteSta
 								hr = spAudioEndpoint->GetMute(o_muteState);
 								if (FAILED(hr)) {
 									printf("Failed to get mute state\n");
-									spAudioEndpoint->Release();
-									spAudioEndpoint = NULL;
+									SAFE_RELEASE(spAudioEndpoint);
 									PropVariantClear(&varName);
-									spProperty->Release();
-									spProperty = NULL;
-									spDevice->Release();
-									spDevice = NULL;
-									spCollection->Release();
-									spCollection = NULL;
-									spEnumerator->Release();
-									spEnumerator = NULL;
+									SAFE_RELEASE(spProperty);
+									SAFE_RELEASE(spDevice);
+									SAFE_RELEASE(spCollection);
+									SAFE_RELEASE(spEnumerator);
 									return;
 								}
 							}
-							spAudioEndpoint->Release();
-							spAudioEndpoint = NULL;
+							SAFE_RELEASE(spAudioEndpoint);
 
 						}
 					}
 					PropVariantClear(&varName);
 				}
-				spProperty->Release();
-				spProperty = NULL;
+				SAFE_RELEASE(spProperty);
 			}
 
 		}
-		spDevice->Release();
-		spDevice = NULL;
+		SAFE_RELEASE(spDevice);
 	}
 
-	spCollection->Release();
-	spCollection = NULL;
-	spEnumerator->Release();
-	spEnumerator = NULL;
+	SAFE_RELEASE(spCollection);
+	SAFE_RELEASE(spEnumerator);
 }
 
 void DeviceControl::setDeviceMute(const std::wstring* i_devName, const BOOL* i_muteState)
@@ -325,40 +315,30 @@ void DeviceControl::setDeviceMute(const std::wstring* i_devName, const BOOL* i_m
 								hr = spAudioEndpoint->SetMute(*i_muteState, NULL);
 								if (FAILED(hr)) {
 									printf("Failed to set mute state\n");
-									spAudioEndpoint->Release();
-									spAudioEndpoint = NULL;
+									SAFE_RELEASE(spAudioEndpoint);
 									PropVariantClear(&varName);
-									spProperty->Release();
-									spProperty = NULL;
-									spDevice->Release();
-									spDevice = NULL;
-									spCollection->Release();
-									spCollection = NULL;
-									spEnumerator->Release();
-									spEnumerator = NULL;
+									SAFE_RELEASE(spProperty);
+									SAFE_RELEASE(spDevice);
+									SAFE_RELEASE(spCollection);
+									SAFE_RELEASE(spEnumerator);
 									return;
 								}
 							}
-							spAudioEndpoint->Release();
-							spAudioEndpoint = NULL;
+							SAFE_RELEASE(spAudioEndpoint);
 
 						}
 					}
 					PropVariantClear(&varName);
 				}
-				spProperty->Release();
-				spProperty = NULL;
+				SAFE_RELEASE(spProperty);
 			}
 
 		}
-		spDevice->Release();
-		spDevice = NULL;
+		SAFE_RELEASE(spDevice);
 	}
 
-	spCollection->Release();
-	spCollection = NULL;
-	spEnumerator->Release();
-	spEnumerator = NULL;
+	SAFE_RELEASE(spCollection);
+	SAFE_RELEASE(spEnumerator);
 }
 
 void DeviceControl::getDeviceVolume(const std::wstring* i_devName, float* o_volumeLevel)
@@ -417,40 +397,29 @@ void DeviceControl::getDeviceVolume(const std::wstring* i_devName, float* o_volu
 									hr = spAudioEndpoint->GetMasterVolumeLevelScalar(o_volumeLevel);
 									if (FAILED(hr)) {
 										printf("Failed to set mute state\n");
-										spAudioEndpoint->Release();
-										spAudioEndpoint = NULL;
+										SAFE_RELEASE(spAudioEndpoint);
 										PropVariantClear(&varName);
-										spProperty->Release();
-										spProperty = NULL;
-										spDevice->Release();
-										spDevice = NULL;
-										spCollection->Release();
-										spCollection = NULL;
-										spEnumerator->Release();
-										spEnumerator = NULL;
+										SAFE_RELEASE(spProperty);
+										SAFE_RELEASE(spDevice);
+										SAFE_RELEASE(spCollection);
+										SAFE_RELEASE(spEnumerator);
 										return;
 									}
 								}
-								spAudioEndpoint->Release();
-								spAudioEndpoint = NULL;
-
+								SAFE_RELEASE(spAudioEndpoint);
 							}
 						}
 						PropVariantClear(&varName);
 					}
-					spProperty->Release();
-					spProperty = NULL;
+					SAFE_RELEASE(spProperty);
 				}
 
 			}
-			spDevice->Release();
-			spDevice = NULL;
+			SAFE_RELEASE(spDevice);
 		}
 
-		spCollection->Release();
-		spCollection = NULL;
-		spEnumerator->Release();
-		spEnumerator = NULL;
+		SAFE_RELEASE(spCollection);
+		SAFE_RELEASE(spEnumerator);
 	}
 }
 
@@ -510,39 +479,29 @@ void DeviceControl::setDeviceVolume(const std::wstring* i_devName, const float* 
 									hr = spAudioEndpoint->SetMasterVolumeLevelScalar(*i_volumeLevel, NULL);
 									if (FAILED(hr)) {
 										printf("Failed to set mute state\n");
-										spAudioEndpoint->Release();
-										spAudioEndpoint = NULL;
+										SAFE_RELEASE(spAudioEndpoint);
 										PropVariantClear(&varName);
-										spProperty->Release();
-										spProperty = NULL;
-										spDevice->Release();
-										spDevice = NULL;
-										spCollection->Release();
-										spCollection = NULL;
-										spEnumerator->Release();
-										spEnumerator = NULL;
+										SAFE_RELEASE(spProperty);
+										SAFE_RELEASE(spDevice);
+										SAFE_RELEASE(spCollection);
+										SAFE_RELEASE(spEnumerator);
 										return;
 									}
 								}
-								spAudioEndpoint->Release();
-								spAudioEndpoint = NULL;
+								SAFE_RELEASE(spAudioEndpoint);
 
 							}
 						}
 						PropVariantClear(&varName);
 					}
-					spProperty->Release();
-					spProperty = NULL;
+					SAFE_RELEASE(spProperty);
 				}
 
 			}
-			spDevice->Release();
-			spDevice = NULL;
+			SAFE_RELEASE(spDevice);
 		}
 
-		spCollection->Release();
-		spCollection = NULL;
-		spEnumerator->Release();
-		spEnumerator = NULL;
+		SAFE_RELEASE(spCollection);
+		SAFE_RELEASE(spEnumerator);
 	}
 }

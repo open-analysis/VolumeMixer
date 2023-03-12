@@ -4,7 +4,9 @@
 #include "audio/VolumeControl.h"
 #include "audio/InputControl.h"
 #include "audio/AudioControl.h"
-#include "audio/EndPointData.h"
+#include "audio/DeviceControl.h"
+#include "utils/utils.h"
+#include "utils/EndPointData.h"
 
 void testInputControl()
 {
@@ -70,13 +72,15 @@ void testVolumeControl()
 	vc.destroy();
 }
 
-void testAudioControl()
+void testDeviceControl()
 {
-	VolumeControl vc;
+	DeviceControl dc = DeviceControl(eConsole, eRender);
 	std::vector<EndPointData> endPoints;
 
+	dc.init();
+
 	std::cout << "Getting volume endpoints" << std::endl;
-	vc.GetEndPointDeviceData(endPoints);
+	dc.getEndPointDeviceData(endPoints);
 	for (auto elem : endPoints)
 	{
 		std::wcout << elem.devID << std::endl;
@@ -86,17 +90,27 @@ void testAudioControl()
 	}
 
 	endPoints.clear();
-	InputControl ic;
-	std::cout << "Getting input endpoints" << std::endl;
-	ic.GetEndPointDeviceData(endPoints);
-	for (auto elem : endPoints)
-	{
-		std::wcout << elem.devID << std::endl;
-		std::wcout << "\t" << elem.name << std::endl;
-		std::wcout << "\t" << elem.bDefault << std::endl;
 
-	}
+	BOOL mute;
+	std::wstring headphones = L"Speakers (USB Audio DAC   )";
+	std::wstring speakers = L"Speakers (Realtek High Definition Audio)";
+	/*dc.getDeviceMute(&headphones, &mute);
+	std::cout << "Mute state: " << mute << std::endl;
+	mute = !mute;
+	dc.setDeviceMute(&headphones, &mute);
+	std::cout << "Muting..." << std::endl;
+	dc.getDeviceMute(&headphones, &mute);
+	std::cout << "Mute state: " << mute << std::endl;*/
 
+	//std::wstring* currOutput = &speakers;
+	std::wstring* currOutput = &headphones;
+	role audioRole = eConsole;
+
+	std::cout << "Setting default output to ";
+	std::wcout << *currOutput << std::endl;
+	dc.setDefaultEndpoint(currOutput, &audioRole);
+
+	dc.destroy();
 }
 
 int main(int argc, CHAR* argv[])
@@ -105,7 +119,7 @@ int main(int argc, CHAR* argv[])
 	testVolumeControl();*/
 
 	std::cout << "Testing Audio Control" << std::endl;
-	testAudioControl();
+	testDeviceControl();
 
 	/*std::cout << "\n\nTesting input control" << std::endl;
 	testInputControl();*/

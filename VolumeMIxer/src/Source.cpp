@@ -7,6 +7,7 @@
 #include "audio/DeviceControl.h"
 #include "utils/utils.h"
 #include "utils/EndPointData.h"
+#include "web/webClient.h"
 
 void testInputControl()
 {
@@ -94,13 +95,13 @@ void testDeviceControl()
 	BOOL mute;
 	std::wstring headphones = L"Speakers (USB Audio DAC   )";
 	std::wstring speakers = L"Speakers (Realtek High Definition Audio)";
-	/*dc.getDeviceMute(&headphones, &mute);
+	dc.getDeviceMute(&headphones, &mute);
 	std::cout << "Mute state: " << mute << std::endl;
 	mute = !mute;
 	dc.setDeviceMute(&headphones, &mute);
 	std::cout << "Muting..." << std::endl;
 	dc.getDeviceMute(&headphones, &mute);
-	std::cout << "Mute state: " << mute << std::endl;*/
+	std::cout << "Mute state: " << mute << std::endl;
 
 	//std::wstring* currOutput = &speakers;
 	std::wstring* currOutput = &headphones;
@@ -113,17 +114,27 @@ void testDeviceControl()
 	dc.destroy();
 }
 
+void testWeb()
+{
+	std::cout << "Starting web client..." << std::endl;
+
+	webClient client;
+}
+
 int main(int argc, CHAR* argv[])
 {
 	/*printf("Testing Volume Control\n");
 	testVolumeControl();*/
 
-	std::cout << "Testing Audio Control" << std::endl;
-	testDeviceControl();
+	/*std::cout << "Testing Audio Control" << std::endl;
+	testDeviceControl();*/
 
 	/*std::cout << "\n\nTesting input control" << std::endl;
 	testInputControl();*/
 	
+	std::cout << "Testing web client" << std::endl;
+	testWeb();
+
 	printf("\n\n\nDone\n");
 
 	return 0;

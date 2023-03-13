@@ -132,7 +132,9 @@
     <ClCompile Include="src\audio\InputControl.cpp" />
     <ClCompile Include="src\audio\VolumeControl.cpp" />
     <ClCompile Include="src\Source.cpp" />
+    <ClCompile Include="src\utils\parser.h" />
     <ClCompile Include="src\utils\utils.cpp" />
+    <ClCompile Include="src\web\webClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\audio\DeviceControl.h" />
@@ -142,6 +144,7 @@
     <ClInclude Include="src\audio\VolumeControl.h" />
     <ClInclude Include="src\utils\PolicyConfig.h" />
     <ClInclude Include="src\utils\utils.h" />
+    <ClInclude Include="src\web\webClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

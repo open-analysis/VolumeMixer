@@ -1,32 +1,38 @@
 #pragma once
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdio.h>
+#include <Windows.h>
+#include <winhttp.h>
+#include <iostream>
 
-#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "WinHttp.lib")
 
-#define DEFAULT_BUFLEN 512
-// Change these as needed
-#define MIXER_IP_ADDR "192.168.1.142"
-#define MIXER_PORT "5000"
+#define MIXER_IP_ADDR L"192.168.1.142"
+#define MIXER_PORT 5000
 
 class webClient
 {
 private:
-	SOCKET m_connSocket;
+	HINTERNET m_httpSession;
+	HINTERNET m_httpConnect;
+	HINTERNET m_httpRequest;
+
 public:
-	int getQueue();
-	int postDevices();
-	int delDevices();
-	int postPrograms();
-	int delPrograms();
+	webClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
+
+	bool getQueue();
+	bool postDevices();
+	bool delDevices();
+	bool postPrograms();
+	bool delPrograms();
 
 private:
-	int openConnection();
-	int closeConnection();
+	bool request(LPCWSTR i_url, LPCWSTR i_action);
+	inline void closeConnection()
+	{
+		if (m_httpSession) WinHttpCloseHandle(m_httpSession);
+		if (m_httpConnect) WinHttpCloseHandle(m_httpConnect);
+		if (m_httpRequest) WinHttpCloseHandle(m_httpRequest);
+	}
 
-	int sendMessage(char* message, int messageSize);
-	int receiveMessage(char* buffer, int bufSize);
 };
 

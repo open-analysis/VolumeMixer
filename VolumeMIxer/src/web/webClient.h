@@ -20,13 +20,13 @@ public:
 	webClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
 
 	bool getQueue();
-	bool postDevices();
+	bool postDevices(char *i_buffer);
 	bool delDevices();
 	bool postPrograms();
 	bool delPrograms();
 
 private:
-	bool request(LPCWSTR i_url, LPCWSTR i_action);
+	bool request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension);
 	inline void closeConnection()
 	{
 		if (m_httpSession) WinHttpCloseHandle(m_httpSession);

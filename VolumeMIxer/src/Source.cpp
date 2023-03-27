@@ -6,7 +6,9 @@ void testWeb()
 
 	webClient client;
 
-	client.getQueue();
+	//client.getQueue();
+	char l_buf[] = "{\"type\":\"in\", \"name\":\"Cool microphone\", \"img\": \"\", \"default\": true}";
+	client.postDevices(l_buf);
 }
 
 int main(int argc, CHAR* argv[])

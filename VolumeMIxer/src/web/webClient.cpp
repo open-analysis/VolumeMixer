@@ -7,7 +7,7 @@ bool webClient::getQueue()
 	DWORD l_bytesRead = 0;
 	LPSTR l_buffer;
 
-	if (request(MIXER_IP_ADDR, L"GET"))
+	if (request(MIXER_IP_ADDR, L"GET", L"queue"))
 	{
 
 		// Send the GET request
@@ -79,13 +79,61 @@ end_request:
 	return l_results;
 }
 
-bool webClient::request(LPCWSTR i_url, LPCWSTR i_action)
+bool webClient::postDevices(char* i_buffer)
+{
+	bool l_results = true;
+	DWORD l_bytesWritten = 0;
+
+	if (request(MIXER_IP_ADDR, L"POST", L"devices"))
+	{
+		// Send the POST request
+		if (!WinHttpSendRequest(m_httpRequest,
+								WINHTTP_NO_ADDITIONAL_HEADERS,
+								0,
+								WINHTTP_NO_REQUEST_DATA,
+								0,
+								(DWORD)strlen(i_buffer),
+								0))
+		{
+			std::cout << "Failed to send HTTP Request (WinHttpSendRequest): " << GetLastError() << std::endl;
+			l_results = false;
+			goto end_request;
+		}
+
+		// Write data to the server.
+		if (!WinHttpWriteData(m_httpRequest, 
+							 i_buffer,
+							 (DWORD)strlen(i_buffer),
+							 &l_bytesWritten))
+		{
+			std::cout << "Failed to write HTTP data (WinHttpWriteData): " << GetLastError() << std::endl;
+			l_results = false;
+			goto end_request;
+		}
+		
+		// End the request.
+		if (!WinHttpReceiveResponse(m_httpRequest, NULL))
+		{
+			std::cout << "Failed to end HTTP request (WinHttpReceiveRequest): " << GetLastError() << std::endl;
+			l_results = false;
+			goto end_request;
+		}
+	}
+
+	std::cout << "Done posting devices" << std::endl;
+
+end_request:
+	closeConnection();
+	return l_results;
+}
+
+bool webClient::request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension)
 {
 	m_httpSession = WinHttpOpen(L"Volume Mixer Program",
-		WINHTTP_ACCESS_TYPE_NO_PROXY,
-		WINHTTP_NO_PROXY_NAME,
-		WINHTTP_NO_PROXY_BYPASS,
-		0);
+								WINHTTP_ACCESS_TYPE_NO_PROXY,
+								WINHTTP_NO_PROXY_NAME,
+								WINHTTP_NO_PROXY_BYPASS,
+								0);
 	if (!m_httpSession)
 	{
 		std::cout << "Failed to establish HTTP Session (WinHttpOpen): " << GetLastError() << std::endl;
@@ -105,7 +153,7 @@ bool webClient::request(LPCWSTR i_url, LPCWSTR i_action)
 
 	m_httpRequest = WinHttpOpenRequest(m_httpConnect, 
 									   i_action, 
-									   L"queue", 
+									   i_extension,
 									   NULL,
 									   WINHTTP_NO_REFERER, 
 									   WINHTTP_DEFAULT_ACCEPT_TYPES, 

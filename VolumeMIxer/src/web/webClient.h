@@ -21,9 +21,9 @@ public:
 
 	bool getQueue();
 	bool postDevices(char *i_buffer);
-	bool delDevices();
-	bool postPrograms();
-	bool delPrograms();
+	bool deleteDevices(char* i_buffer);
+	bool postPrograms(char* i_buffer);
+	bool deletePrograms(char* i_buffer);
 
 private:
 	bool request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension);

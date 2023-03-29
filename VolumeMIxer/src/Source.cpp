@@ -7,8 +7,57 @@ void testWeb()
 	webClient client;
 
 	//client.getQueue();
-	char l_buf[] = "{\"type\":\"in\", \"name\":\"Cool microphone\", \"img\": \"\", \"default\": true}";
-	client.postDevices(l_buf);
+	/*char l_buf_dev[] = "{\"type\":\"in\", \"name\":\"Cool microphone\", \"img\": \"\", \"default\": true}";
+	client.postDevices(l_buf_dev);
+
+	std::cout << "[Enter]" << std::endl;
+	std::cin.get();
+
+	client.deleteDevices(l_buf_dev);
+
+	std::cout << "[Enter]" << std::endl;
+	std::cin.get();*/
+
+	char l_buf_dev[15][75] = { "{\"type\": \"in\", \"name\" : \"microphone\", \"img\" : \"\", \"default\" : true}",
+							   "{\"type\": \"out\", \"name\" : \"speakers\", \"img\" : \"\", \"default\" : false}",
+							   "{\"type\": \"in\", \"name\" : \"test input\", \"img\" : \"\", \"default\" : false}",
+							   "{\"type\": \"out\", \"name\" : \"headphones\", \"img\" : \"\", \"default\" : true}" };
+
+	char l_buf_progs[15][50] = {"{\"name\":\"Spotify\", \"img\": \"\"}",
+							 "{\"name\":\"Discord\", \"img\": \"\"}",
+							 "{\"name\":\"Firefox\", \"img\": \"\"}",
+							 "{\"name\":\"Civ6\", \"img\": \"\"}",
+							 "{\"name\":\"Prog0\", \"img\": \"\"}",
+							 "{\"name\":\"Prog1\", \"img\": \"\"}",
+							 "{\"name\":\"Prog2\", \"img\": \"\"}",
+							 "{\"name\":\"Prog3\", \"img\": \"\"}",
+							 "{\"name\":\"Prog4\", \"img\": \"\"}",
+							 "{\"name\":\"Prog5\", \"img\": \"\"}" };
+
+	for (auto dev : l_buf_dev)
+	{
+		if (dev[0] == '{')
+		{
+			std::cout << dev << std::endl;
+			client.postPrograms(dev);
+		}
+	}
+	
+	for (auto prog : l_buf_progs)
+	{
+		if (prog[0] == '{')
+		{
+			std::cout << prog << std::endl;
+			client.postPrograms(prog);
+		}
+	}
+
+
+	std::cout << "[Enter]" << std::endl;
+	std::cin.get();
+
+	client.deletePrograms(l_buf_progs[0]);
+
 }
 
 int main(int argc, CHAR* argv[])

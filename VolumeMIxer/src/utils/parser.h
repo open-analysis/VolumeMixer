@@ -1,9 +1,14 @@
+#pragma once
 /*
 	TODO:
 		* Write JSON parser
 */
 
-void parseJSON()
+class parser
 {
+public:
+	parser();
 
-}
+private:
+
+};

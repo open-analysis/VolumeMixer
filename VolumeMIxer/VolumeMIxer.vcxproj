@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\utils\parser.cpp" />
     <ClCompile Include="src\audio\DeviceControl.cpp" />
     <ClCompile Include="src\audio\AudioControl.cpp" />
     <ClCompile Include="src\audio\InputControl.cpp" />

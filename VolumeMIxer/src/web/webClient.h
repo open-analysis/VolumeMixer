@@ -19,7 +19,7 @@ private:
 public:
 	webClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
 
-	bool getQueue();
+	char* getQueue();
 	bool postDevices(char *i_buffer);
 	bool deleteDevices(char* i_buffer);
 	bool postPrograms(char* i_buffer);

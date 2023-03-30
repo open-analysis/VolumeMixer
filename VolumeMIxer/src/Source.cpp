@@ -6,17 +6,7 @@ void testWeb()
 
 	webClient client;
 
-	//client.getQueue();
-	/*char l_buf_dev[] = "{\"type\":\"in\", \"name\":\"Cool microphone\", \"img\": \"\", \"default\": true}";
-	client.postDevices(l_buf_dev);
-
-	std::cout << "[Enter]" << std::endl;
-	std::cin.get();
-
-	client.deleteDevices(l_buf_dev);
-
-	std::cout << "[Enter]" << std::endl;
-	std::cin.get();*/
+	char* l_buffer = nullptr;
 
 	char l_buf_dev[15][75] = { "{\"type\": \"in\", \"name\" : \"microphone\", \"img\" : \"\", \"default\" : true}",
 							   "{\"type\": \"out\", \"name\" : \"speakers\", \"img\" : \"\", \"default\" : false}",
@@ -39,7 +29,7 @@ void testWeb()
 		if (dev[0] == '{')
 		{
 			std::cout << dev << std::endl;
-			client.postPrograms(dev);
+			client.postDevices(dev);
 		}
 	}
 	
@@ -52,11 +42,22 @@ void testWeb()
 		}
 	}
 
+	std::cout << "[Enter]" << std::endl;
+	std::cin.get();
+
+	l_buffer = client.getQueue();
+
+	std::cout << "MainLoop:Buffer: " << l_buffer << std::endl;
 
 	std::cout << "[Enter]" << std::endl;
 	std::cin.get();
 
 	client.deletePrograms(l_buf_progs[0]);
+
+	std::cout << "[Enter]" << std::endl;
+	std::cin.get();
+
+	client.deleteDevices(l_buf_dev[0]);
 
 }
 

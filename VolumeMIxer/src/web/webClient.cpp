@@ -1,11 +1,11 @@
 #include "webClient.h"
 
-bool webClient::getQueue()
+char* webClient::getQueue()
 {
 	bool l_results = true;
 	DWORD l_bytesAvailable = 0;
 	DWORD l_bytesRead = 0;
-	LPSTR l_buffer;
+	LPSTR l_buffer = NULL;
 
 	if (request(MIXER_IP_ADDR, L"GET", L"queue"))
 	{
@@ -61,22 +61,13 @@ bool webClient::getQueue()
 					l_results = false;
 					goto end_request;
 				}
-				else
-				{
-					// Do something with the data
-					std::cout << "Buffer: " << l_buffer << std::endl;
-				}
-
-				delete[] l_buffer;
 			}
 		}
 	}
 
-	std::cout << "Done getting Queue" << std::endl;
-
 end_request:
 	closeConnection();
-	return l_results;
+	return l_buffer;
 }
 
 bool webClient::postDevices(char* i_buffer)

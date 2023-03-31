@@ -127,13 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\utils\parser.cpp" />
+    <ClCompile Include="src\utils\Parser.cpp" />
     <ClCompile Include="src\audio\DeviceControl.cpp" />
     <ClCompile Include="src\audio\AudioControl.cpp" />
     <ClCompile Include="src\audio\InputControl.cpp" />
     <ClCompile Include="src\audio\VolumeControl.cpp" />
     <ClCompile Include="src\Source.cpp" />
-    <ClCompile Include="src\utils\parser.h" />
+    <ClCompile Include="src\utils\Parser.h" />
     <ClCompile Include="src\utils\utils.cpp" />
     <ClCompile Include="src\web\webClient.cpp" />
   </ItemGroup>

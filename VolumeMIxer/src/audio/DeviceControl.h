@@ -36,14 +36,14 @@ public:
 	void getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);
 	
 	// Thanks to EreTIk & amate for figuring this out
-	void setDefaultEndpoint(const std::wstring* i_devName, const role* i_role);
+	void setDefaultEndpoint(const std::wstring* i_devName, const role i_role);
 
 	void toggleDeviceMute(const std::wstring* i_devName);
 	void getDeviceMute(const std::wstring* i_devName, BOOL* o_muteState);
-	void setDeviceMute(const std::wstring* i_devName, const BOOL* i_muteState);
+	void setDeviceMute(const std::wstring* i_devName, const BOOL i_muteState);
 
 	void getDeviceVolume(const std::wstring* i_devName, float *o_volumeLevel);
-	void setDeviceVolume(const std::wstring* i_devName, const float* i_volumeLevel);
+	void setDeviceVolume(const std::wstring* i_devName, const float i_volumeLevel);
 
 };
 

@@ -100,7 +100,7 @@ void AudioControl::toggleMute(const std::wstring* i_name)
 	}
 }
 
-void AudioControl::setMute(const std::wstring* i_name, const BOOL* i_mute)
+void AudioControl::setMute(const std::wstring* i_name, const BOOL i_mute)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -139,7 +139,7 @@ void AudioControl::setMute(const std::wstring* i_name, const BOOL* i_mute)
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
 									if (SUCCEEDED(hr))
 									{
-										hr = simpleAudioVolume->SetMute(*i_mute, NULL);
+										hr = simpleAudioVolume->SetMute(i_mute, NULL);
 										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}

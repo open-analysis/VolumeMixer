@@ -56,7 +56,7 @@ void VolumeControl::getAudioStreams(std::vector<std::wstring>& o_streams)
 	}
 }
 
-void VolumeControl::setVolume(const std::wstring* i_name, const float* i_volume)
+void VolumeControl::setVolume(const std::wstring* i_name, const float i_volume)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -95,7 +95,7 @@ void VolumeControl::setVolume(const std::wstring* i_name, const float* i_volume)
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
 									if (SUCCEEDED(hr))
 									{
-										simpleAudioVolume->SetMasterVolume(*i_volume, NULL);
+										simpleAudioVolume->SetMasterVolume(i_volume, NULL);
 										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}
@@ -177,7 +177,7 @@ void VolumeControl::muteAll()
 
 	for (auto prog : inputs)
 	{
-		AudioControl::setMute(&prog, &MUTE);
+		AudioControl::setMute(&prog, MUTE);
 	}
 
 	inputs.clear();
@@ -192,7 +192,7 @@ void VolumeControl::unmuteAll()
 
 	for (auto prog : inputs)
 	{
-		AudioControl::setMute(&prog, &MUTE);
+		AudioControl::setMute(&prog, MUTE);
 	}
 
 	inputs.clear();

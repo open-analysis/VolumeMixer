@@ -36,10 +36,10 @@
     <ClCompile Include="src\web\webClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\parser.h">
+    <ClCompile Include="src\utils\Parser.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\parser.cpp">
+    <ClCompile Include="src\utils\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

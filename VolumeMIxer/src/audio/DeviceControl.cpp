@@ -122,7 +122,7 @@ void DeviceControl::getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint
 	return;
 }
 
-void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role* i_role)
+void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role i_role)
 {
 	std::vector<EndPointData> spEndPoints;
 	IPolicyConfig* spPolicyConfig = nullptr;
@@ -164,7 +164,7 @@ void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role
 		if (devId != NULL)
 		{
 			std::cout << "Setting default endpoint" << std::endl;
-			hr = spPolicyConfig->SetDefaultEndpoint(devId, *i_role);
+			hr = spPolicyConfig->SetDefaultEndpoint(devId, i_role);
 			SAFE_RELEASE(spPolicyConfig);
 		}
 	}
@@ -176,7 +176,7 @@ void DeviceControl::toggleDeviceMute(const std::wstring* i_devName)
 	BOOL spMuteState;
 	getDeviceMute(i_devName, &spMuteState);
 	spMuteState = !spMuteState;
-	setDeviceMute(i_devName, &spMuteState);
+	setDeviceMute(i_devName, spMuteState);
 }
 
 void DeviceControl::getDeviceMute(const std::wstring* i_devName, BOOL* o_muteState)
@@ -260,7 +260,7 @@ void DeviceControl::getDeviceMute(const std::wstring* i_devName, BOOL* o_muteSta
 	SAFE_RELEASE(spEnumerator);
 }
 
-void DeviceControl::setDeviceMute(const std::wstring* i_devName, const BOOL* i_muteState)
+void DeviceControl::setDeviceMute(const std::wstring* i_devName, const BOOL i_muteState)
 {
 	constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
@@ -312,7 +312,7 @@ void DeviceControl::setDeviceMute(const std::wstring* i_devName, const BOOL* i_m
 							hr = spDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr, (LPVOID*)&spAudioEndpoint);
 							if (SUCCEEDED(hr))
 							{
-								hr = spAudioEndpoint->SetMute(*i_muteState, NULL);
+								hr = spAudioEndpoint->SetMute(i_muteState, NULL);
 								if (FAILED(hr)) {
 									printf("Failed to set mute state\n");
 									SAFE_RELEASE(spAudioEndpoint);
@@ -423,7 +423,7 @@ void DeviceControl::getDeviceVolume(const std::wstring* i_devName, float* o_volu
 	}
 }
 
-void DeviceControl::setDeviceVolume(const std::wstring* i_devName, const float* i_volumeLevel)
+void DeviceControl::setDeviceVolume(const std::wstring* i_devName, const float i_volumeLevel)
 {
 	{
 		constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
@@ -476,7 +476,7 @@ void DeviceControl::setDeviceVolume(const std::wstring* i_devName, const float* 
 								hr = spDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr, (LPVOID*)&spAudioEndpoint);
 								if (SUCCEEDED(hr))
 								{
-									hr = spAudioEndpoint->SetMasterVolumeLevelScalar(*i_volumeLevel, NULL);
+									hr = spAudioEndpoint->SetMasterVolumeLevelScalar(i_volumeLevel, NULL);
 									if (FAILED(hr)) {
 										printf("Failed to set mute state\n");
 										SAFE_RELEASE(spAudioEndpoint);

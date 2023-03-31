@@ -54,7 +54,7 @@ void InputControl::getInputStreams(std::vector<std::wstring>& o_streams)
 	}
 }
 
-void InputControl::setBoost(const std::wstring* i_name, const float* i_volume)
+void InputControl::setBoost(const std::wstring* i_name, const float i_volume)
 {
 	IAudioSessionEnumerator* audioSessionEnumerator;
 	IAudioSessionControl* audioSessionControl;
@@ -93,7 +93,7 @@ void InputControl::setBoost(const std::wstring* i_name, const float* i_volume)
 									hr = audioSessionControl2->QueryInterface(__uuidof(ISimpleAudioVolume), (void**)&simpleAudioVolume);
 									if (SUCCEEDED(hr))
 									{
-										simpleAudioVolume->SetMasterVolume(*i_volume, NULL);
+										simpleAudioVolume->SetMasterVolume(i_volume, NULL);
 										SAFE_RELEASE(simpleAudioVolume);
 									}
 								}
@@ -175,7 +175,7 @@ void InputControl::muteAll()
 
 	for (auto prog : inputs)
 	{
-		AudioControl::setMute(&prog, &MUTE);
+		AudioControl::setMute(&prog, MUTE);
 	}
 
 	inputs.clear();
@@ -190,7 +190,7 @@ void InputControl::unmuteAll()
 
 	for (auto prog : inputs)
 	{
-		AudioControl::setMute(&prog, &MUTE);
+		AudioControl::setMute(&prog, MUTE);
 	}
 
 	inputs.clear();

@@ -30,7 +30,7 @@ public:
 	void destroy();
 
 	void toggleMute(const std::wstring*);
-	void setMute(const std::wstring*, const BOOL*);
+	void setMute(const std::wstring*, const BOOL);
 	void getMute(const std::wstring*, BOOL*);
 	virtual void muteAll() = 0;
 	virtual void unmuteAll() = 0;

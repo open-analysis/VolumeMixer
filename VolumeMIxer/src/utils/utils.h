@@ -3,12 +3,7 @@
 #include <Windows.h>
 #include <string>
 #include <Mmdeviceapi.h>
-
-#define DEBUG 1
-
-#if DEBUG
 #include <iostream>
-#endif 
 
 #define SAFE_RELEASE(x) if (x) { x->Release(); x = 0; }
 

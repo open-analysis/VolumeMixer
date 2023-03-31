@@ -7,7 +7,6 @@
 #include <codecvt>
 #include <locale>
 
-#include "../audio/AudioControl.h"
 #include "../audio/DeviceControl.h"
 #include "../audio/InputControl.h"
 #include "../audio/VolumeControl.h"
@@ -27,4 +26,5 @@ public:
 
 private:
 	inline std::wstring convert(std::string i_str);
+	void removeCharsFromString(std::string& str, char* charsToRemove);
 };

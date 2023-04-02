@@ -3,13 +3,12 @@
 Parser::Parser()
 {
 	std::cout << "Don't use this constructor" << std::endl;
-	m_volCntl = nullptr;
-	m_inCntl = nullptr;
+	m_audioCntl = nullptr;
 	m_devCntl = nullptr;
 }
 
-Parser::Parser(VolumeControl* i_volCntl, InputControl* i_inCntl, DeviceControl* i_devCntl) :
-	m_volCntl(i_volCntl), m_inCntl(i_inCntl), m_devCntl(i_devCntl)
+Parser::Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl) :
+	m_audioCntl(i_audioCntl), m_devCntl(i_devCntl)
 {
 }
 
@@ -24,6 +23,7 @@ void Parser::parseQueue(char* i_buffer, std::vector<std::wstring>& i_outputs, st
 	size_t l_queue_start = 0;
 	size_t l_queue_end = 0;
 	std::wstring l_name;
+	AudioControl* l_controller = nullptr;
 
 	// Break up the queue into each separate command
 	while ((l_queue_start = l_str.find_first_not_of(c_queue_delim, l_queue_end)) != std::string::npos)
@@ -55,75 +55,51 @@ void Parser::parseQueue(char* i_buffer, std::vector<std::wstring>& i_outputs, st
 		// Determine type that's being operated on
 		if (l_cmds[0] == "device")
 		{
-			// Determine action
-			if (l_cmds[2] == "mute")
-			{
-				// Determine state
-				if (l_cmds[3] == "True")
-				{
-					m_devCntl->setDeviceMute(&l_name, true);
-				}
-				// Determine state
-				else if (l_cmds[3] == "False")
-				{
-					m_devCntl->setDeviceMute(&l_name, false);
-				}
-				// Determine state
-				else if (l_cmds[3] == "toggle")
-				{
-					m_devCntl->toggleDeviceMute(&l_name);
-				}
-			}
-			// Determine action
-			else if (l_cmds[2] == "volume")
-			{
-				float l_vol = 0;
-				m_devCntl->getDeviceVolume(&l_name, &l_vol);
-				l_vol += (stoi(l_cmds[3]) / 100);
-				m_devCntl->setDeviceVolume(&l_name, l_vol);
-			}
-			// Determine action
-			else if (l_cmds[2] == "setDefault")
-			{
-				// Determine state
-				if (l_cmds[3] == "out")
-				{
-					m_devCntl->setDefaultEndpoint(&l_name, ERole::eConsole);
-				}
-				else
-				{
-					m_devCntl->setDefaultEndpoint(&l_name, ERole::eCommunications);
-				}
-			}
+			l_controller = m_devCntl;
 		}
 		else
 		{
-			// Determine action
-			if (l_cmds[2] == "mute")
+			l_controller = m_audioCntl;
+		}
+
+		// Determine action
+		if (l_cmds[2] == "mute")
+		{
+			// Determine state
+			if (l_cmds[3] == "True")
 			{
-				// Determine state
-				if (l_cmds[3] == "True")
-				{
-					m_volCntl->setMute(&l_name, true);
-				}
-				// Determine state
-				else if (l_cmds[3] == "False")
-				{
-					m_volCntl->setMute(&l_name, false);
-				}
-				// Determine state
-				else if (l_cmds[3] == "toggle")
-				{
-					m_volCntl->toggleMute(&l_name);
-				}
+				l_controller->setMute(&l_name, true);
 			}
-			// Determine action
-			else if (l_cmds[2] == "volume")
+			// Determine state
+			else if (l_cmds[3] == "False")
 			{
-				float l_vol = 0;
-				m_volCntl->getVolume(&l_name, &l_vol);
-				l_vol += (stoi(l_cmds[3]) / 100);
-				m_volCntl->setVolume(&l_name, l_vol);
+				l_controller->setMute(&l_name, false);
+			}
+			// Determine state
+			else if (l_cmds[3] == "toggle")
+			{
+				l_controller->toggleMute(&l_name);
+			}
+		}
+		// Determine action
+		else if (l_cmds[2] == "volume")
+		{
+			float l_vol = 0;
+			l_controller->getVolume(&l_name, &l_vol);
+			l_vol += (stoi(l_cmds[3]) / 100);
+			l_controller->setVolume(&l_name, l_vol);
+		}
+		// Determine action
+		else if (l_cmds[2] == "setDefault")
+		{
+			// Determine state
+			if (l_cmds[3] == "out")
+			{
+				m_devCntl->setDefaultEndpoint(&l_name, ERole::eConsole);
+			}
+			else
+			{
+				m_devCntl->setDefaultEndpoint(&l_name, ERole::eCommunications);
 			}
 		}
 	}

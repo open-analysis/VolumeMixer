@@ -2,48 +2,12 @@
 
 DeviceControl::DeviceControl()
 {
-	m_deviceEnumerator = NULL;
-	m_device = NULL;
-	m_audioSessionManager2 = NULL;
-	m_eRole = eConsole;
-	m_eDataFlow = eRender;
+	AudioControl::init(eRender, eConsole);
 }
 
 DeviceControl::DeviceControl(role i_eRole, dataFlow i_eDataFlow)
 {
-	DeviceControl();
-	m_eRole = i_eRole;
-	m_eDataFlow = i_eDataFlow;
-}
-
-void DeviceControl::init()
-{
-	HRESULT hr = CoInitialize(NULL);
-	if (SUCCEEDED(hr))
-	{
-		hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_ALL, __uuidof(IMMDeviceEnumerator), (void**)&m_deviceEnumerator);
-		if (SUCCEEDED(hr))
-		{
-			hr = m_deviceEnumerator->GetDefaultAudioEndpoint(m_eDataFlow, m_eRole, &m_device);
-			if (SUCCEEDED(hr))
-			{
-				hr = m_device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL, NULL, (VOID**)&m_audioSessionManager2);
-				if (SUCCEEDED(hr))
-				{
-					return;
-				}
-			}
-		}
-	}
-}
-
-void DeviceControl::destroy()
-{
-	// Release the resources
-	SAFE_RELEASE(m_audioSessionManager2);
-	SAFE_RELEASE(m_device);
-	SAFE_RELEASE(m_deviceEnumerator);
-	CoUninitialize();
+	AudioControl::init(i_eDataFlow, i_eRole);
 }
 
 void DeviceControl::getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint)
@@ -171,15 +135,15 @@ void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role
 
 }
 
-void DeviceControl::toggleDeviceMute(const std::wstring* i_devName)
+void DeviceControl::toggleMute(const std::wstring* i_devName)
 {
 	BOOL spMuteState;
-	getDeviceMute(i_devName, &spMuteState);
+	getMute(i_devName, &spMuteState);
 	spMuteState = !spMuteState;
-	setDeviceMute(i_devName, spMuteState);
+	setMute(i_devName, spMuteState);
 }
 
-void DeviceControl::getDeviceMute(const std::wstring* i_devName, BOOL* o_muteState)
+void DeviceControl::getMute(const std::wstring* i_devName, BOOL* o_muteState)
 {
 	constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
@@ -260,7 +224,7 @@ void DeviceControl::getDeviceMute(const std::wstring* i_devName, BOOL* o_muteSta
 	SAFE_RELEASE(spEnumerator);
 }
 
-void DeviceControl::setDeviceMute(const std::wstring* i_devName, const BOOL i_muteState)
+void DeviceControl::setMute(const std::wstring* i_devName, const BOOL i_muteState)
 {
 	constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
@@ -341,7 +305,7 @@ void DeviceControl::setDeviceMute(const std::wstring* i_devName, const BOOL i_mu
 	SAFE_RELEASE(spEnumerator);
 }
 
-void DeviceControl::getDeviceVolume(const std::wstring* i_devName, float* o_volumeLevel)
+void DeviceControl::getVolume(const std::wstring* i_devName, float* o_volumeLevel)
 {
 	{
 		constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
@@ -423,7 +387,7 @@ void DeviceControl::getDeviceVolume(const std::wstring* i_devName, float* o_volu
 	}
 }
 
-void DeviceControl::setDeviceVolume(const std::wstring* i_devName, const float i_volumeLevel)
+void DeviceControl::setVolume(const std::wstring* i_devName, const float i_volumeLevel)
 {
 	{
 		constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);

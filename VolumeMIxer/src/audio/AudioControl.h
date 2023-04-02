@@ -25,14 +25,25 @@ protected:
 public:
 
 	AudioControl();
-
+	
+	/*
+		Sample input:
+			init(eCapture, eCommunications);
+		Sample output
+			init(eRender, eConsole);
+	*/
 	void init(EDataFlow, ERole);
 	void destroy();
 
-	void toggleMute(const std::wstring*);
-	void setMute(const std::wstring*, const BOOL);
-	void getMute(const std::wstring*, BOOL*);
-	virtual void muteAll() = 0;
-	virtual void unmuteAll() = 0;
+	void getStreams(std::vector<std::wstring>& o_streams);
+
+	void setVolume(const std::wstring* i_name, const float i_level);
+	void getVolume(const std::wstring* i_name, float* o_level);
+
+	void toggleMute(const std::wstring* i_name);
+	void setMute(const std::wstring* i_name, const BOOL i_muteState);
+	void getMute(const std::wstring* i_name, BOOL* o_muteState);
+	void muteAll();
+	void unmuteAll();
 
 };

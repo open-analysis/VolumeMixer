@@ -18,12 +18,6 @@
     <ClCompile Include="src\Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\audio\VolumeControl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\audio\InputControl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\utils\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -44,12 +38,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\audio\VolumeControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\audio\InputControl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\utils\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -9,27 +9,18 @@
 #include <endpointvolume.h>
 #include <functiondiscoverykeys_devpkey.h>
 
-#include "../utils/utils.h"
+#include "AudioControl.h"
 #include "../utils/EndPointData.h"
 #include "../utils/PolicyConfig.h"
 
-class DeviceControl
+class DeviceControl : public AudioControl
 {
-private:
-	IMMDeviceEnumerator* m_deviceEnumerator;
-	IMMDevice* m_device;
-	IAudioSessionManager2* m_audioSessionManager2;
-	role m_eRole;
-	dataFlow m_eDataFlow;
-
-	utils util;
-
 public:
 	DeviceControl();
 	DeviceControl(role i_eRole, dataFlow i_eDataFlow);
 
-	void init();
-	void destroy();
+	//void init();
+	//void destroy();
 
 	// Thank you to amate for how to get the endpoints
 	//  https://github.com/amate/SetDefaultAudioDevice
@@ -38,12 +29,11 @@ public:
 	// Thanks to EreTIk & amate for figuring this out
 	void setDefaultEndpoint(const std::wstring* i_devName, const role i_role);
 
-	void toggleDeviceMute(const std::wstring* i_devName);
-	void getDeviceMute(const std::wstring* i_devName, BOOL* o_muteState);
-	void setDeviceMute(const std::wstring* i_devName, const BOOL i_muteState);
+	void toggleMute(const std::wstring* i_devName);
+	void getMute(const std::wstring* i_devName, BOOL* o_muteState);
+	void setMute(const std::wstring* i_devName, const BOOL i_muteState);
 
-	void getDeviceVolume(const std::wstring* i_devName, float *o_volumeLevel);
-	void setDeviceVolume(const std::wstring* i_devName, const float i_volumeLevel);
-
+	void getVolume(const std::wstring* i_devName, float *o_volumeLevel);
+	void setVolume(const std::wstring* i_devName, const float i_volumeLevel);
 };
 

@@ -1,9 +1,9 @@
 #include <iostream>
+#include <vector>
 #include "web/webClient.h"
 
 void testWeb()
 {
-
 	webClient client;
 
 	char* l_buffer = nullptr;
@@ -24,7 +24,7 @@ void testWeb()
 							 "{\"name\":\"Prog4\", \"img\": \"\"}",
 							 "{\"name\":\"Prog5\", \"img\": \"\"}" };
 
-	for (auto dev : l_buf_dev)
+	/*for (auto dev : l_buf_dev)
 	{
 		if (dev[0] == '{')
 		{
@@ -40,7 +40,7 @@ void testWeb()
 			std::cout << prog << std::endl;
 			client.postPrograms(prog);
 		}
-	}
+	}*/
 
 	std::cout << "[Enter]" << std::endl;
 	std::cin.get();

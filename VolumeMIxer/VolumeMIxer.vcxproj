@@ -130,8 +130,6 @@
     <ClCompile Include="src\utils\Parser.cpp" />
     <ClCompile Include="src\audio\DeviceControl.cpp" />
     <ClCompile Include="src\audio\AudioControl.cpp" />
-    <ClCompile Include="src\audio\InputControl.cpp" />
-    <ClCompile Include="src\audio\VolumeControl.cpp" />
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\utils\Parser.h" />
     <ClCompile Include="src\utils\utils.cpp" />
@@ -141,8 +139,6 @@
     <ClInclude Include="src\audio\DeviceControl.h" />
     <ClInclude Include="src\utils\EndPointData.h" />
     <ClInclude Include="src\audio\AudioControl.h" />
-    <ClInclude Include="src\audio\InputControl.h" />
-    <ClInclude Include="src\audio\VolumeControl.h" />
     <ClInclude Include="src\utils\PolicyConfig.h" />
     <ClInclude Include="src\utils\utils.h" />
     <ClInclude Include="src\web\webClient.h" />

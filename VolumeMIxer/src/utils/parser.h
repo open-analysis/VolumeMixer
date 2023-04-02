@@ -20,7 +20,7 @@ public:
 	Parser();
 	Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl);
 
-	void parseQueue(char* i_buffer, std::vector<std::wstring>& i_outputs, std::vector<std::wstring>& i_inputs, std::vector<std::wstring>& i_devices);
+	void parseQueue(char* i_buffer);
 
 	void setAudioCntl(AudioControl* i_audioCntl)
 	{

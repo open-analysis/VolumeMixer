@@ -1,10 +1,22 @@
 #include <iostream>
 #include <vector>
 #include "web/webClient.h"
+#include "utils/Parser.h"
+
+#define OUTPUT 1
+#define INPUT 0
+#define DEVICES 1
 
 void testWeb()
 {
 	webClient client;
+	AudioControl l_outputCntl = AudioControl();
+	DeviceControl l_devCntl = DeviceControl();
+
+	l_outputCntl.init(eRender, eConsole);
+	l_devCntl.init(eRender, eConsole);
+
+	Parser parser = Parser(&l_outputCntl, &l_devCntl);
 
 	char* l_buffer = nullptr;
 
@@ -40,24 +52,29 @@ void testWeb()
 			std::cout << prog << std::endl;
 			client.postPrograms(prog);
 		}
-	}*/
+	}
 
 	std::cout << "[Enter]" << std::endl;
-	std::cin.get();
+	std::cin.get();*/
 
 	l_buffer = client.getQueue();
 
 	std::cout << "MainLoop:Buffer: " << l_buffer << std::endl;
 
+	parser.parseQueue(l_buffer);
+
 	std::cout << "[Enter]" << std::endl;
 	std::cin.get();
+
+	/*l_outputCntl.destroy();
+	l_devCntl.destroy();
 
 	client.deletePrograms(l_buf_progs[0]);
 
 	std::cout << "[Enter]" << std::endl;
 	std::cin.get();
 
-	client.deleteDevices(l_buf_dev[0]);
+	client.deleteDevices(l_buf_dev[0]);*/
 
 }
 

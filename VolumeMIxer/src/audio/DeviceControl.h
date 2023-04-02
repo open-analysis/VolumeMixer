@@ -19,9 +19,6 @@ public:
 	DeviceControl();
 	DeviceControl(role i_eRole, dataFlow i_eDataFlow);
 
-	//void init();
-	//void destroy();
-
 	// Thank you to amate for how to get the endpoints
 	//  https://github.com/amate/SetDefaultAudioDevice
 	void getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);

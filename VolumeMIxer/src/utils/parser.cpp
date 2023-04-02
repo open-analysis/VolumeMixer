@@ -12,7 +12,7 @@ Parser::Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl) :
 {
 }
 
-void Parser::parseQueue(char* i_buffer, std::vector<std::wstring>& i_outputs, std::vector<std::wstring>& i_inputs, std::vector<std::wstring>& i_devices)
+void Parser::parseQueue(char* i_buffer)
 {
 	constexpr char c_queue_delim = ',';
 	constexpr char c_cmd_delim = ' ';
@@ -31,9 +31,10 @@ void Parser::parseQueue(char* i_buffer, std::vector<std::wstring>& i_outputs, st
 		l_queue_end = l_str.find(c_queue_delim, l_queue_start);
 		l_queue.push_back(l_str.substr(l_queue_start, (l_queue_end - l_queue_start)));
 	}
-	for (auto t_queue : l_queue)
+
+	for (unsigned int i = 0; i < l_queue.size(); i++)
 	{
-		removeCharsFromString(t_queue, c_remove_chars);
+		removeCharsFromString(l_queue[i], c_remove_chars);
 	}
 
 	for (auto t_queue : l_queue)

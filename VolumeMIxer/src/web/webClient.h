@@ -20,10 +20,8 @@ public:
 	webClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
 
 	char* getQueue();
-	bool postDevices(char *i_buffer);
-	bool deleteDevices(char* i_buffer);
-	bool postPrograms(char* i_buffer);
-	bool deletePrograms(char* i_buffer);
+	bool post(char* i_buffer, LPCWSTR i_ext);
+	bool del(char* i_buffer, LPCWSTR i_ext);
 
 private:
 	bool request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension);

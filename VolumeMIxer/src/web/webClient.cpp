@@ -70,60 +70,12 @@ end_request:
 	return l_buffer;
 }
 
-bool webClient::postDevices(char* i_buffer)
+bool webClient::post(char* i_buffer, LPCWSTR i_ext)
 {
 	bool l_results = true;
 	DWORD l_bytesWritten = 0;
 
-	if (request(MIXER_IP_ADDR, L"POST", L"devices"))
-	{
-		// Send the POST request
-		if (!WinHttpSendRequest(m_httpRequest,
-								WINHTTP_NO_ADDITIONAL_HEADERS,
-								0,
-								WINHTTP_NO_REQUEST_DATA,
-								0,
-								(DWORD)strlen(i_buffer),
-								0))
-		{
-			std::cout << "Failed to send HTTP Request (WinHttpSendRequest): " << GetLastError() << std::endl;
-			l_results = false;
-			goto end_request;
-		}
-
-		// Write data to the server.
-		if (!WinHttpWriteData(m_httpRequest, 
-							 i_buffer,
-							 (DWORD)strlen(i_buffer),
-							 &l_bytesWritten))
-		{
-			std::cout << "Failed to write HTTP data (WinHttpWriteData): " << GetLastError() << std::endl;
-			l_results = false;
-			goto end_request;
-		}
-		
-		// End the request.
-		if (!WinHttpReceiveResponse(m_httpRequest, NULL))
-		{
-			std::cout << "Failed to end HTTP request (WinHttpReceiveRequest): " << GetLastError() << std::endl;
-			l_results = false;
-			goto end_request;
-		}
-	}
-
-	std::cout << "Done posting devices" << std::endl;
-
-end_request:
-	closeConnection();
-	return l_results;
-}
-
-bool webClient::deleteDevices(char* i_buffer)
-{
-	bool l_results = true;
-	DWORD l_bytesWritten = 0;
-
-	if (request(MIXER_IP_ADDR, L"DELETE", L"devices"))
+	if (request(MIXER_IP_ADDR, L"POST", i_ext))
 	{
 		// Send the POST request
 		if (!WinHttpSendRequest(m_httpRequest,
@@ -159,19 +111,17 @@ bool webClient::deleteDevices(char* i_buffer)
 		}
 	}
 
-	std::cout << "Done delete devices" << std::endl;
-
 end_request:
 	closeConnection();
 	return l_results;
 }
 
-bool webClient::postPrograms(char* i_buffer)
+bool webClient::del(char* i_buffer, LPCWSTR i_ext)
 {
 	bool l_results = true;
 	DWORD l_bytesWritten = 0;
 
-	if (request(MIXER_IP_ADDR, L"POST", L"programs"))
+	if (request(MIXER_IP_ADDR, L"DELETE", i_ext))
 	{
 		// Send the POST request
 		if (!WinHttpSendRequest(m_httpRequest,
@@ -206,56 +156,6 @@ bool webClient::postPrograms(char* i_buffer)
 			goto end_request;
 		}
 	}
-
-	std::cout << "Done posting programs" << std::endl;
-
-end_request:
-	closeConnection();
-	return l_results;
-}
-
-bool webClient::deletePrograms(char* i_buffer)
-{
-	bool l_results = true;
-	DWORD l_bytesWritten = 0;
-
-	if (request(MIXER_IP_ADDR, L"DELETE", L"programs"))
-	{
-		// Send the POST request
-		if (!WinHttpSendRequest(m_httpRequest,
-			WINHTTP_NO_ADDITIONAL_HEADERS,
-			0,
-			WINHTTP_NO_REQUEST_DATA,
-			0,
-			(DWORD)strlen(i_buffer),
-			0))
-		{
-			std::cout << "Failed to send HTTP Request (WinHttpSendRequest): " << GetLastError() << std::endl;
-			l_results = false;
-			goto end_request;
-		}
-
-		// Write data to the server.
-		if (!WinHttpWriteData(m_httpRequest,
-			i_buffer,
-			(DWORD)strlen(i_buffer),
-			&l_bytesWritten))
-		{
-			std::cout << "Failed to write HTTP data (WinHttpWriteData): " << GetLastError() << std::endl;
-			l_results = false;
-			goto end_request;
-		}
-
-		// End the request.
-		if (!WinHttpReceiveResponse(m_httpRequest, NULL))
-		{
-			std::cout << "Failed to end HTTP request (WinHttpReceiveRequest): " << GetLastError() << std::endl;
-			l_results = false;
-			goto end_request;
-		}
-	}
-
-	std::cout << "Done delete programs" << std::endl;
 
 end_request:
 	closeConnection();

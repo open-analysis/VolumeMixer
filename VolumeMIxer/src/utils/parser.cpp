@@ -12,32 +12,13 @@ Parser::Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl) :
 {
 }
 
-void Parser::parseQueue(char* i_buffer)
+void Parser::parseQueue(const std::string i_direction, const std::string i_type)
 {
-	constexpr char c_queue_delim = ',';
 	constexpr char c_cmd_delim = ' ';
-
-	std::string l_str = (std::string)i_buffer;
-	std::vector<std::string> l_queue;
-	char c_remove_chars[] = "[\"],";
-	size_t l_queue_start = 0;
-	size_t l_queue_end = 0;
 	std::wstring l_name;
 	AudioControl* l_controller = nullptr;
 
-	// Break up the queue into each separate command
-	while ((l_queue_start = l_str.find_first_not_of(c_queue_delim, l_queue_end)) != std::string::npos)
-	{
-		l_queue_end = l_str.find(c_queue_delim, l_queue_start);
-		l_queue.push_back(l_str.substr(l_queue_start, (l_queue_end - l_queue_start)));
-	}
-
-	for (unsigned int i = 0; i < l_queue.size(); i++)
-	{
-		removeCharsFromString(l_queue[i], c_remove_chars);
-	}
-
-	for (auto t_queue : l_queue)
+	for (auto t_queue : m_queue)
 	{
 		std::vector<std::string> l_cmds;
 		size_t l_cmd_start = 0;
@@ -50,11 +31,16 @@ void Parser::parseQueue(char* i_buffer)
 			l_cmds.push_back(t_queue.substr(l_cmd_start, (l_cmd_end - l_cmd_start)));
 		}
 
+		// Check if the cmds direction & type are correct
+		//  The direction is handled outside of this function
+		//  ie by setting Audio/DeviceControl 
+		if (l_cmds[0] != i_type || l_cmds[2] != i_direction) continue;
+
 		// Get the name of the device/program
 		l_name = convert(l_cmds[1]);
 
 		// Determine type that's being operated on
-		if (l_cmds[0] == "device")
+		if (i_type == "device")
 		{
 			l_controller = m_devCntl;
 		}
@@ -64,37 +50,37 @@ void Parser::parseQueue(char* i_buffer)
 		}
 
 		// Determine action
-		if (l_cmds[2] == "mute")
+		if (l_cmds[3] == "mute")
 		{
 			// Determine state
-			if (l_cmds[3] == "True")
+			if (l_cmds[4] == "True")
 			{
 				l_controller->setMute(&l_name, true);
 			}
 			// Determine state
-			else if (l_cmds[3] == "False")
+			else if (l_cmds[4] == "False")
 			{
 				l_controller->setMute(&l_name, false);
 			}
 			// Determine state
-			else if (l_cmds[3] == "toggle")
+			else if (l_cmds[4] == "toggle")
 			{
 				l_controller->toggleMute(&l_name);
 			}
 		}
 		// Determine action
-		else if (l_cmds[2] == "volume")
+		else if (l_cmds[3] == "volume")
 		{
 			float l_vol = 0;
 			l_controller->getVolume(&l_name, &l_vol);
-			l_vol += (stoi(l_cmds[3]) / 100);
+			l_vol += (stoi(l_cmds[4]) / 100);
 			l_controller->setVolume(&l_name, l_vol);
 		}
 		// Determine action
-		else if (l_cmds[2] == "setDefault")
+		else if (l_cmds[3] == "setDefault")
 		{
 			// Determine state
-			if (l_cmds[3] == "out")
+			if (l_cmds[2] == "out")
 			{
 				m_devCntl->setDefaultEndpoint(&l_name, ERole::eConsole);
 			}
@@ -105,6 +91,28 @@ void Parser::parseQueue(char* i_buffer)
 		}
 	}
 	
+}
+
+void Parser::setQueue(char* i_buffer)
+{
+	constexpr char c_queue_delim = ',';
+
+	std::string l_str = (std::string)i_buffer;
+	char c_remove_chars[] = "[\"],";
+	size_t l_queue_start = 0;
+	size_t l_queue_end = 0;
+
+	// Break up the queue into each separate command
+	while ((l_queue_start = l_str.find_first_not_of(c_queue_delim, l_queue_end)) != std::string::npos)
+	{
+		l_queue_end = l_str.find(c_queue_delim, l_queue_start);
+		m_queue.push_back(l_str.substr(l_queue_start, (l_queue_end - l_queue_start)));
+	}
+
+	for (unsigned int i = 0; i < m_queue.size(); i++)
+	{
+		removeCharsFromString(m_queue[i], c_remove_chars);
+	}
 }
 
 inline std::wstring Parser::convert(std::string i_str)

@@ -66,3 +66,13 @@ std::wstring utils::extractName(WCHAR i_imageName[])
 	return o_progName;
 
 }
+
+std::wstring utils::convertStr2Wstr(std::string i_str)
+{
+	return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(i_str);
+}
+
+std::string utils::convertWstr2Str(std::wstring i_wstr)
+{
+	return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(i_wstr);
+}

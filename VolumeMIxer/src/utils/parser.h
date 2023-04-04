@@ -3,12 +3,10 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstdint>
-#include <codecvt>
-#include <locale>
 
 #include "../audio/AudioControl.h"
 #include "../audio/DeviceControl.h"
+#include "../utils/utils.h"
 
 class Parser
 {
@@ -37,6 +35,5 @@ public:
 	}
 
 private:
-	inline std::wstring convert(std::string i_str);
 	void removeCharsFromString(std::string& str, char* charsToRemove);
 };

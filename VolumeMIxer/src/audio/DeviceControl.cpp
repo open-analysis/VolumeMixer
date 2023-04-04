@@ -10,7 +10,7 @@ DeviceControl::DeviceControl(role i_eRole, dataFlow i_eDataFlow)
 	AudioControl::init(i_eDataFlow, i_eRole);
 }
 
-void DeviceControl::getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint)
+void DeviceControl::getEndPointDeviceData(std::vector<EndPointData>& o_vecEndPoint)
 {
 	constexpr CLSID CLSID_MMDeviceEnumerator = __uuidof(MMDeviceEnumerator);
 	constexpr IID IID_IMMDeviceEnumerator = __uuidof(IMMDeviceEnumerator);
@@ -77,7 +77,7 @@ void DeviceControl::getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint
 						data.name = varName.pwszVal;
 					PropVariantClear(&varName);
 				}
-				vecEndPoint.push_back(data);
+				o_vecEndPoint.push_back(data);
 			}
 
 		}
@@ -85,6 +85,16 @@ void DeviceControl::getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint
 
 	return;
 }
+void DeviceControl::getStreams(std::vector<std::wstring>& o_vecNames)
+{
+	std::vector<EndPointData> l_endPointData;
+	getEndPointDeviceData(l_endPointData);
+	for (auto t_datum : l_endPointData)
+	{
+		o_vecNames.push_back(t_datum.name);
+	}
+}
+
 
 void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role i_role)
 {
@@ -115,22 +125,19 @@ void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role
 
 		if (!wcscmp(elem_name_c, i_devName_c))
 		{
-			std::wcout << L"Found endpoint " << elem_name_c << std::endl;
+			//std::wcout << L"Found endpoint " << elem_name_c << std::endl;
 			devId = elem.devID.c_str();
-			std::wcout << L"DevID: " << devId << std::endl;
-			std::wcout << L"Elem ID: " << elem.devID << std::endl;
+			//std::wcout << L"DevID: " << devId << std::endl;
+			//std::wcout << L"Elem ID: " << elem.devID << std::endl;
 			break;
 		}
 	}
-	std::wcout << L"DevID: " << devId << std::endl;
+	//std::wcout << L"DevID: " << devId << std::endl;
 
-	if (spPolicyConfig != NULL) {
-		if (devId != NULL)
-		{
-			std::cout << "Setting default endpoint" << std::endl;
-			hr = spPolicyConfig->SetDefaultEndpoint(devId, i_role);
-			SAFE_RELEASE(spPolicyConfig);
-		}
+	if ((spPolicyConfig != NULL) && (devId != NULL)) {
+		std::cout << "Setting default endpoint" << std::endl;
+		hr = spPolicyConfig->SetDefaultEndpoint(devId, i_role);
+		SAFE_RELEASE(spPolicyConfig);
 	}
 
 }

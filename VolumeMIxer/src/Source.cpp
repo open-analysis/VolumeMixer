@@ -1,12 +1,51 @@
 #include <iostream>
 #include <vector>
+#include <set>
 #include "web/webClient.h"
 #include "utils/Parser.h"
 
+#define RELEASE 1
 #define DEBUG_POST 1
 #define DEBUG_DEL 0
 #define PROG_INPUT 0
 #define DEV_INPUT 0
+
+void sendComputerData(webClient* i_client, std::vector<std::wstring>* i_names, std::set<std::wstring>* i_set, const bool i_isDevice)
+{
+	unsigned int l_count = 0;
+
+	// Check what items are in the vector vs set
+	for (auto i : *i_names)
+	{
+		l_count++;
+		// If the current item is not found in the set
+		//  Add it & send it to the server
+		if (!i_set->count(i))
+		{
+			i_set->insert(i);
+			//webPost(&i_client, i, i_isDevice);
+		}
+	}
+	// If there's more names in the set than the returned vector
+	//  then an item got deleted
+	if (l_count < i_set->size())
+	{
+		for (auto i : *i_set)
+		{
+			l_count++;
+			// If the current item is not found in the set
+			//  Add it & send it to the server
+			auto t_pos = i_set->find(i);
+			if (t_pos != i_set->end())
+			{
+				i_set->erase(t_pos);
+				//webDel(&i_client, t_pos, i_isDevice);
+			}
+		}
+	}
+
+	i_names->clear();
+}
 
 void webDel(webClient* i_client, char* i_buffer, const bool i_isDevice)
 {
@@ -42,12 +81,12 @@ void webGet(webClient* i_client, Parser* i_parser)
 
 	l_buffer = i_client->getQueue();
 
-	//std::cout << "MainLoop:Buffer: " << l_buffer << std::endl;
+	std::cout << "MainLoop:Buffer: " << l_buffer << std::endl;
 
 	i_parser->setQueue(l_buffer);
 }
 
-void run()
+void runProgram()
 {
 	webClient l_client;
 
@@ -67,71 +106,63 @@ void run()
 	l_devInputCntl.init(eCapture, eCommunications);
 #endif
 
-	char l_buf_dev[15][75] = { "{\"type\": \"in\", \"name\" : \"microphone\", \"img\" : \"\", \"default\" : true}",
-							   "{\"type\": \"out\", \"name\" : \"speakers\", \"img\" : \"\", \"default\" : false}",
-							   "{\"type\": \"in\", \"name\" : \"test input\", \"img\" : \"\", \"default\" : false}",
-							   "{\"type\": \"out\", \"name\" : \"headphones\", \"img\" : \"\", \"default\" : true}" };
+	std::set<std::wstring> l_devOutputNames;
+	std::set<std::wstring> l_progOutputNames;
+#if DEV_INPUT
+	std::set<std::wstring> l_devInputNames;
+#endif
+#if PROG_INPUT
+	std::set<std::wstring> l_progInputNames;
+#endif
+	std::vector<std::wstring> l_currNames;
 
-	char l_buf_progs[15][50] = {"{\"name\":\"Spotify\", \"img\": \"\"}",
-							 "{\"name\":\"Discord\", \"img\": \"\"}",
-							 "{\"name\":\"Firefox\", \"img\": \"\"}",
-							 "{\"name\":\"Civ6\", \"img\": \"\"}",
-							 "{\"name\":\"Prog0\", \"img\": \"\"}",
-							 "{\"name\":\"Prog1\", \"img\": \"\"}",
-							 "{\"name\":\"Prog2\", \"img\": \"\"}",
-							 "{\"name\":\"Prog3\", \"img\": \"\"}",
-							 "{\"name\":\"Prog4\", \"img\": \"\"}",
-							 "{\"name\":\"Prog5\", \"img\": \"\"}" };
-
-#if DEBUG_POST
-	for (auto dev : l_buf_dev)
+	while (1)
 	{
-		if (dev[0] == '{')
-		{
-			std::cout << dev << std::endl;
-			webPost(&l_client, dev, 1);
-		}
-	}
-	
-	for (auto prog : l_buf_progs)
-	{
-		if (prog[0] == '{')
-		{
-			std::cout << prog << std::endl;
-			webPost(&l_client, prog, 0);
-		}
-	}
+		// Get & send computer data to server
+		l_devOutputCntl.getStreams(l_currNames);
+		sendComputerData(&l_client, &l_currNames, &l_devOutputNames, true);
+		l_progOutputCntl.getStreams(l_currNames);
+		sendComputerData(&l_client, &l_currNames, &l_progOutputNames, false);
 
-	std::cout << "[Enter]" << std::endl;
-	std::cin.get();
+		for (auto t : l_devOutputNames)
+			std::wcout << t << std::endl;
+		for (auto t : l_progOutputNames)
+			std::wcout << t << std::endl;
+
+#if DEV_INPUT
+		l_devInputCntl.getStreams(l_currNames);
+		sendComputerData(&l_client, &l_devInputCntl, &l_devInputNames, true);
+#endif
+#if PROG_INPUT
+		l_progInputCntl.getStreams(l_currNames);
+		sendComputerData(&l_client, &l_progInputCntl, &l_progInputNames, false);
 #endif
 
-	webGet(&l_client, &l_parser);
+		// Get server data
+		webGet(&l_client, &l_parser);
 
-	/*l_parser.parseQueue("out", "device");
-	l_parser.parseQueue("out", "program");*/
-
+#if 0 // Current out of the program for testing. Don't want to accidentally break anything
+		// Parse received data
+		l_parser.parseQueue("out", "device");
+		l_parser.parseQueue("out", "program");
 
 #if PROG_INPUT
-	l_parser.setAudioCntl(&l_progInputCntl);
-	l_parser.parseQueue("in", "program");
-	l_parser.setAudioCntl(&l_progOutputCntl);
+		l_parser.setAudioCntl(&l_progInputCntl);
+		l_parser.parseQueue("in", "program");
+		l_parser.setAudioCntl(&l_progOutputCntl);
 #endif
 #if DEV_INPUT
-	l_parser.setAudioCntl(&l_devInputCntl);
-	l_parser.parseQueue("in", "device");
-	l_parser.setAudioCntl(&l_devOutputCntl);
+		l_parser.setAudioCntl(&l_devInputCntl);
+		l_parser.parseQueue("in", "device");
+		l_parser.setAudioCntl(&l_devOutputCntl);
 #endif
-	
-	l_parser.flushQueue();
 
-	std::cout << "[Enter]" << std::endl;
-	std::cin.get();
+#endif 
+		// Flush queue
+		l_parser.flushQueue();
 
-#if DEBUG_DEL
-	webDel(&l_client, l_buf_dev[0], 1);
-	webDel(&l_client, l_buf_progs[0], 0);
-#endif
+		Sleep(1000);
+	}
 
 	l_progOutputCntl.destroy();
 	l_devOutputCntl.destroy();
@@ -146,7 +177,7 @@ void run()
 
 int main(int argc, CHAR* argv[])
 {
-	run();
-
+	runProgram();
+	
 	return 0;
 }

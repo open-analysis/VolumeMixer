@@ -22,6 +22,7 @@ public:
 	// Thank you to amate for how to get the endpoints
 	//  https://github.com/amate/SetDefaultAudioDevice
 	void getEndPointDeviceData(std::vector<EndPointData>& vecEndPoint);
+	void getStreams(std::vector<std::wstring>& o_vecNames);
 	
 	// Thanks to EreTIk & amate for figuring this out
 	void setDefaultEndpoint(const std::wstring* i_devName, const role i_role);

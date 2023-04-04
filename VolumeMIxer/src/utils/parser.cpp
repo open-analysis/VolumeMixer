@@ -15,6 +15,9 @@ Parser::Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl) :
 void Parser::parseQueue(const std::string i_direction, const std::string i_type)
 {
 	constexpr char c_cmd_delim = ' ';
+
+	utils l_util = utils();
+
 	std::wstring l_name;
 	AudioControl* l_controller = nullptr;
 
@@ -37,7 +40,7 @@ void Parser::parseQueue(const std::string i_direction, const std::string i_type)
 		if (l_cmds[0] != i_type || l_cmds[2] != i_direction) continue;
 
 		// Get the name of the device/program
-		l_name = convert(l_cmds[1]);
+		l_name = l_util.convertStr2Wstr(l_cmds[1]);
 
 		// Determine type that's being operated on
 		if (i_type == "device")
@@ -113,11 +116,6 @@ void Parser::setQueue(char* i_buffer)
 	{
 		removeCharsFromString(m_queue[i], c_remove_chars);
 	}
-}
-
-inline std::wstring Parser::convert(std::string i_str)
-{
-	return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(i_str);
 }
 
 void Parser::removeCharsFromString(std::string& str, char* charsToRemove) {

@@ -7,6 +7,7 @@ AudioControl::AudioControl()
 	m_audioSessionManager2 = NULL;
 	m_eDataFlow = eRender;
 	m_eRole = eConsole;
+	m_img = "";
 }
 
 void AudioControl::init(EDataFlow dataFlow, ERole role)

@@ -16,7 +16,7 @@ void Parser::parseQueue(const std::string i_direction, const std::string i_type)
 {
 	constexpr char c_cmd_delim = ' ';
 
-	utils l_util = utils();
+	Utils l_util = Utils();
 
 	std::wstring l_name;
 	AudioControl* l_controller = nullptr;
@@ -116,6 +116,71 @@ void Parser::setQueue(char* i_buffer)
 	{
 		removeCharsFromString(m_queue[i], c_remove_chars);
 	}
+}
+
+std::string Parser::device2Json(const bool i_isOutput, const std::wstring i_name, const std::string i_img, const bool i_default)
+{
+	Utils l_util = Utils();
+	std::string r_return = "";
+
+	r_return = m_JSON_SECTIONS[0]; // {
+
+	r_return += m_JSON_SECTIONS[1]; // "type": 
+	if (i_isOutput)
+	{
+		r_return += m_JSON_SECTIONS[3]; // "out",
+	}
+	else
+	{
+		r_return += m_JSON_SECTIONS[2]; // "in",
+	}
+
+	r_return += m_JSON_SECTIONS[4]; // "name": 
+	r_return += "\"";
+	r_return += l_util.convertWstr2Str(i_name); // "", 
+	r_return += "\",";
+
+	r_return += m_JSON_SECTIONS[5]; // "img": 
+	r_return += "\"";
+	r_return += i_img; // "", 
+	r_return += "\",";
+
+	r_return += m_JSON_SECTIONS[6]; // "default": 
+	if (i_default)
+	{
+		r_return += "true";
+	}
+	else
+	{
+		r_return += "false";
+	}
+
+
+	r_return += m_JSON_SECTIONS[7]; // }
+	
+	return r_return;
+}
+
+std::string Parser::program2Json(const std::wstring i_name, const std::string i_img)
+{
+	Utils l_util = Utils();
+	std::string r_return = "";
+
+	r_return = m_JSON_SECTIONS[0]; // {
+	
+	r_return += m_JSON_SECTIONS[4]; // "name": 
+	r_return += "\"";
+	r_return += l_util.convertWstr2Str(i_name);
+	r_return += "\",";
+
+	r_return += m_JSON_SECTIONS[5]; // "img": 
+	r_return += "\"";
+	r_return += i_img; // "", 
+	r_return += "\"";
+
+	r_return += m_JSON_SECTIONS[7]; // }
+
+	return r_return;
 }
 
 void Parser::removeCharsFromString(std::string& str, char* charsToRemove) {

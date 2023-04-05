@@ -132,16 +132,16 @@
     <ClCompile Include="src\audio\AudioControl.cpp" />
     <ClCompile Include="src\Source.cpp" />
     <ClCompile Include="src\utils\Parser.h" />
-    <ClCompile Include="src\utils\utils.cpp" />
-    <ClCompile Include="src\web\webClient.cpp" />
+    <ClCompile Include="src\utils\Utils.cpp" />
+    <ClCompile Include="src\web\WebClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\audio\DeviceControl.h" />
     <ClInclude Include="src\utils\EndPointData.h" />
     <ClInclude Include="src\audio\AudioControl.h" />
     <ClInclude Include="src\utils\PolicyConfig.h" />
-    <ClInclude Include="src\utils\utils.h" />
-    <ClInclude Include="src\web\webClient.h" />
+    <ClInclude Include="src\utils\Utils.h" />
+    <ClInclude Include="src\web\WebClient.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

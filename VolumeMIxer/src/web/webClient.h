@@ -9,7 +9,7 @@
 #define MIXER_IP_ADDR L"192.168.1.142"
 #define MIXER_PORT 5000
 
-class webClient
+class WebClient
 {
 private:
 	HINTERNET m_httpSession;
@@ -17,11 +17,11 @@ private:
 	HINTERNET m_httpRequest;
 
 public:
-	webClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
+	WebClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
 
 	char* getQueue();
-	bool post(char* i_buffer, LPCWSTR i_ext);
-	bool del(char* i_buffer, LPCWSTR i_ext);
+	bool post(std::string i_buffer, LPCWSTR i_ext);
+	bool del(std::string i_buffer, LPCWSTR i_ext);
 
 private:
 	bool request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension);

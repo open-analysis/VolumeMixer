@@ -9,7 +9,7 @@
 #include <functiondiscoverykeys_devpkey.h>
 #include <vector>
 
-#include "../utils/utils.h"
+#include "../utils/Utils.h"
 
 class AudioControl
 {
@@ -20,7 +20,9 @@ protected:
 	role m_eRole;
 	dataFlow m_eDataFlow;
 
-	utils util;
+	Utils util;
+
+	std::string m_img;
 
 public:
 
@@ -45,5 +47,11 @@ public:
 	void getMute(const std::wstring* i_name, BOOL* o_muteState);
 	void muteAll();
 	void unmuteAll();
+
+	std::string getImgPath() { return m_img; }
+	void setImgPath(std::string i_img) 
+	{ 
+		m_img = i_img;
+	}
 
 };

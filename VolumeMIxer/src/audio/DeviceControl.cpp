@@ -135,7 +135,7 @@ void DeviceControl::setDefaultEndpoint(const std::wstring* i_devName, const role
 	//std::wcout << L"DevID: " << devId << std::endl;
 
 	if ((spPolicyConfig != NULL) && (devId != NULL)) {
-		std::cout << "Setting default endpoint" << std::endl;
+		//std::cout << "Setting default endpoint" << std::endl;
 		hr = spPolicyConfig->SetDefaultEndpoint(devId, i_role);
 		SAFE_RELEASE(spPolicyConfig);
 	}

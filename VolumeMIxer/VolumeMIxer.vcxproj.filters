@@ -18,7 +18,7 @@
     <ClCompile Include="src\Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\utils.cpp">
+    <ClCompile Include="src\utils\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\audio\AudioControl.cpp">
@@ -27,7 +27,7 @@
     <ClCompile Include="src\audio\DeviceControl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\web\webClient.cpp">
+    <ClCompile Include="src\web\WebClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utils\Parser.h">
@@ -38,7 +38,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\utils\utils.h">
+    <ClInclude Include="src\utils\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\audio\AudioControl.h">
@@ -53,7 +53,7 @@
     <ClInclude Include="src\utils\PolicyConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\web\webClient.h">
+    <ClInclude Include="src\web\WebClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

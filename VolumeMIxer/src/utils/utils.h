@@ -13,11 +13,11 @@
 typedef __MIDL___MIDL_itf_mmdeviceapi_0000_0000_0002 role;
 typedef __MIDL___MIDL_itf_mmdeviceapi_0000_0000_0001 dataFlow;
 
-class utils
+class Utils
 {
 
 public:
-	utils() {}
+	Utils() {}
 
 	void check(HRESULT);
 

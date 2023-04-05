@@ -1,6 +1,6 @@
-#include "webClient.h"
+#include "WebClient.h"
 
-char* webClient::getQueue()
+char* WebClient::getQueue()
 {
 	bool l_results = true;
 	DWORD l_bytesAvailable = 0;
@@ -70,7 +70,7 @@ end_request:
 	return l_buffer;
 }
 
-bool webClient::post(char* i_buffer, LPCWSTR i_ext)
+bool WebClient::post(std::string i_buffer, LPCWSTR i_ext)
 {
 	bool l_results = true;
 	DWORD l_bytesWritten = 0;
@@ -83,7 +83,7 @@ bool webClient::post(char* i_buffer, LPCWSTR i_ext)
 			0,
 			WINHTTP_NO_REQUEST_DATA,
 			0,
-			(DWORD)strlen(i_buffer),
+			(DWORD) i_buffer.length(),
 			0))
 		{
 			std::cout << "Failed to send HTTP Request (WinHttpSendRequest): " << GetLastError() << std::endl;
@@ -93,8 +93,8 @@ bool webClient::post(char* i_buffer, LPCWSTR i_ext)
 
 		// Write data to the server.
 		if (!WinHttpWriteData(m_httpRequest,
-			i_buffer,
-			(DWORD)strlen(i_buffer),
+			i_buffer.c_str(),
+			(DWORD) i_buffer.length(),
 			&l_bytesWritten))
 		{
 			std::cout << "Failed to write HTTP data (WinHttpWriteData): " << GetLastError() << std::endl;
@@ -116,7 +116,7 @@ end_request:
 	return l_results;
 }
 
-bool webClient::del(char* i_buffer, LPCWSTR i_ext)
+bool WebClient::del(std::string i_buffer, LPCWSTR i_ext)
 {
 	bool l_results = true;
 	DWORD l_bytesWritten = 0;
@@ -129,7 +129,7 @@ bool webClient::del(char* i_buffer, LPCWSTR i_ext)
 			0,
 			WINHTTP_NO_REQUEST_DATA,
 			0,
-			(DWORD)strlen(i_buffer),
+			(DWORD) i_buffer.length(),
 			0))
 		{
 			std::cout << "Failed to send HTTP Request (WinHttpSendRequest): " << GetLastError() << std::endl;
@@ -139,8 +139,8 @@ bool webClient::del(char* i_buffer, LPCWSTR i_ext)
 
 		// Write data to the server.
 		if (!WinHttpWriteData(m_httpRequest,
-			i_buffer,
-			(DWORD)strlen(i_buffer),
+			i_buffer.c_str(),
+			(DWORD) i_buffer.length(),
 			&l_bytesWritten))
 		{
 			std::cout << "Failed to write HTTP data (WinHttpWriteData): " << GetLastError() << std::endl;
@@ -162,7 +162,7 @@ end_request:
 	return l_results;
 }
 
-bool webClient::request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension)
+bool WebClient::request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension)
 {
 	m_httpSession = WinHttpOpen(L"Volume Mixer Program",
 								WINHTTP_ACCESS_TYPE_NO_PROXY,

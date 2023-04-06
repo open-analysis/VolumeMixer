@@ -11,9 +11,11 @@
 class Parser
 {
 private:
-	std::vector<std::string> m_queue;
 	AudioControl* m_audioCntl;
 	DeviceControl* m_devCntl;
+	Utils m_util;
+
+	std::vector<std::string> m_queue;
 
 	std::string m_JSON_SECTIONS[8] = {
 		"{",
@@ -25,6 +27,8 @@ private:
 		"\"default\": ",
 		"}"
 	};
+
+	char c_lf_char;
 
 public:
 	Parser();
@@ -49,5 +53,8 @@ public:
 	}
 
 private:
+	void parseCmdDevice(std::vector<std::string> i_cmds);
+	void parseCmdPrograms(std::vector<std::string> i_cmds);
+
 	void removeCharsFromString(std::string& str, char* charsToRemove);
 };

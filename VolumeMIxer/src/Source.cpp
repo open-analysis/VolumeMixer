@@ -43,7 +43,6 @@ void webGet(WebClient* i_client, Parser* i_parser)
 
 	l_buffer = i_client->getQueue();
 
-	std::cout << "MainLoop:Buffer: " << l_buffer << std::endl;
 
 	i_parser->setQueue(l_buffer);
 }

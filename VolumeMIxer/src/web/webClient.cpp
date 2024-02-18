@@ -15,31 +15,33 @@ char* WebClient::getQueue()
 	return l_buffer;
 }
 
-void WebClient::handshake(const std::set<std::wstring> i_devNames, const std::set<std::wstring> i_progNames)
+void WebClient::handshake(std::vector<AudioDevice>& i_devices, std::vector<Audio>& i_programs, Parser& i_parser)
 {
 	bool l_results = true;
-	LPSTR l_buffer = NULL;
-	LPCWSTR l_ext = L"devices";
+	//LPSTR l_buffer = NULL;
+	std::string l_buffer = "";
 	Utils l_util = Utils();
+	Parser l_parser = Parser();
 
-	l_results = readData(MIXER_IP_ADDR, l_ext, l_buffer);
+	// Get the queue from the server
+	l_buffer = getQueue();
+	// Set the queue in the parser
+	i_parser.setQueue(l_buffer.c_str());
 
-	if (l_buffer != NULL)
+	l_buffer = "";
+
+	// Send the devices to the server
+	for (auto l_device : i_devices)
 	{
-		std::cout << "Debuggin handshake" << std::endl;
-		std::cout << l_buffer << std::endl;
-		return;
-		for (int i = 0; i < sizeof(*l_buffer) / sizeof(l_buffer[0]); i++)
-		{
-			std::wcout << l_buffer[i] << std::endl;
-			for (auto l_devName : i_devNames)
-			{
-				if (!strcmp(l_buffer, l_util.convertWstr2Str(l_devName).c_str()))
-				{
-					// figure out which data is wrong & update the appropriate system
-				}
-			}
-		}
+		l_buffer = i_parser.device2Json(l_device);
+		post(l_buffer, L"devices");
+	}
+
+	// Send the programs to the server
+	for (auto l_program : i_programs)
+	{
+		l_buffer = i_parser.program2Json(l_program);
+		post(l_buffer, L"programs");
 	}
 
 }

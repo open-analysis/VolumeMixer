@@ -15,6 +15,9 @@
 
 class DeviceControl : public AudioControl
 {
+private: 
+	BOOL m_is_output = false;
+
 public:
 	DeviceControl();
 	DeviceControl(role i_eRole, dataFlow i_eDataFlow);
@@ -33,5 +36,7 @@ public:
 
 	void getVolume(const std::wstring* i_devName, float *o_volumeLevel);
 	void setVolume(const std::wstring* i_devName, const float i_volumeLevel);
+
+	BOOL getIsOutput() { return m_is_output; }
 };
 

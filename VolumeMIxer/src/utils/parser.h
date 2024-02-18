@@ -38,7 +38,7 @@ public:
 
 	void parseQueue(const std::string i_direction, const std::string i_type);
 
-	void setQueue(char* i_buffer);
+	void setQueue(const char* i_buffer);
 	void flushQueue() { m_queue.clear(); }
 
 	std::string device2Json(const AudioDevice& i_audio_device);

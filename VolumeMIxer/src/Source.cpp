@@ -13,15 +13,6 @@
 #define DEV_INPUT 0
 #define SLEEP_TIME 1000
 
-void getWeb(WebClient* i_client, Parser* i_parser)
-{
-	char* l_buffer = nullptr;
-
-	l_buffer = i_client->getQueue();
-
-	i_parser->setQueue(l_buffer);
-}
-
 // Make sure the current list of device names is in the set
 //  This is not the most efficient use of system resources. Could be improved by going back to the old method of checking against what's in the list
 //  But this is easier, as removing items doesn't have to be dealt with and trying to find a pointer that doesn't exist anymore.
@@ -35,6 +26,7 @@ void updateClientDevices(std::vector<std::wstring>& i_names, DeviceControl* i_de
 	BOOL l_is_output = 1;
 
 	i_device_cntl->getEndPointDeviceData(l_endPointData);
+	l_is_output = i_device_cntl->getIsOutput();
 	// Clear the set & re-add all of the dat
 	o_set->clear();
 	// Check what items are in the vector vs set
@@ -95,59 +87,6 @@ void updateClientPrograms(std::vector<std::wstring>& i_names, AudioControl* i_au
 	i_names.clear();
 }
 
-void sendComptuerDevices(WebClient* i_client, Parser* i_parser, DeviceControl* i_devCntl, std::vector<std::vector<std::wstring>>* i_actions, const bool i_isOutput)
-{
-	std::string l_buffer;
-
-	std::vector<EndPointData> l_endPointData;
-	i_devCntl->getEndPointDeviceData(l_endPointData);
-
-
-	for (auto t_datum : l_endPointData)
-	{
-		// POST Data
-		for (auto t_name : i_actions[0][0])
-		{
-			if (t_name == t_datum.name)
-			{
-				//l_buffer = i_parser->device2Json(i_isOutput, t_datum.name, i_devCntl->getImgPath(), t_datum.bDefault);
-				i_client->post(l_buffer, L"devices");
-				break;
-			}
-		}
-	
-		// DELETE Data
-		for (auto t_name : i_actions[0][1])
-		{
-			if (t_name == t_datum.name)
-			{
-				//l_buffer = i_parser->device2Json(i_isOutput, t_datum.name, i_devCntl->getImgPath(), t_datum.bDefault);
-				i_client->del(l_buffer, L"devices");
-				break;
-			}
-		}
-	}
-}
-
-void sendComptuerPrograms(WebClient* i_client, Parser* i_parser, AudioControl* i_audCntl, std::vector<std::vector<std::wstring>>* i_actions)
-{
-	std::string l_buffer;
-
-	// POST Data
-	for (auto t_name : i_actions[0][0])
-	{
-		//l_buffer = i_parser->program2Json(t_name, i_audCntl->getImgPath());
-		i_client->post(l_buffer, L"programs");
-	}
-
-	// DELETE Data
-	for (auto t_name : i_actions[0][1])
-	{
-		//l_buffer = i_parser->program2Json(t_name, i_audCntl->getImgPath());
-		i_client->del(l_buffer, L"programs");
-	}
-}
-
 void runProgram()
 {
 #if WEB_CONN
@@ -206,10 +145,6 @@ void runProgram()
 				std::wcout << l_tmp << std::endl;
 #endif
 
-#if WEB_CONN
-		sendComptuerDevices(&l_client, &l_parser, &l_devOutputCntl, &l_actions, true);
-#endif
-
 		// PROGRAMS
 		l_progOutputCntl.getStreams(l_currNames);
 		updateClientPrograms(l_currNames, &l_progOutputCntl, &l_output_audio_programs);
@@ -222,9 +157,6 @@ void runProgram()
 		for (auto l_tmp1 : l_actions)
 			for (auto l_tmp : l_tmp1)
 				std::wcout << l_tmp << std::endl;
-#endif
-#if WEB_CONN
-		sendComptuerPrograms(&l_client, &l_parser, &l_progOutputCntl, &l_actions);
 #endif
 
 #if DEV_INPUT
@@ -255,8 +187,9 @@ void runProgram()
 #endif
 
 #if WEB_CONN
-		// Get server data
-		getWeb(&l_client, &l_parser);
+		// Handshake with the server
+		// IE update the queue of actions from the server & update the server with client data
+		l_client.handshake(l_output_audio_devices, l_output_audio_programs, l_parser);
 
 		// Parse received data
 		l_parser.parseQueue("out", "device");

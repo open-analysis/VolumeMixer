@@ -55,7 +55,7 @@ void Parser::parseQueue(const std::string i_direction, const std::string i_type)
 	
 }
 
-void Parser::setQueue(char* i_buffer)
+void Parser::setQueue(const char* i_buffer)
 {
 	constexpr char c_queue_delim = ',';
 

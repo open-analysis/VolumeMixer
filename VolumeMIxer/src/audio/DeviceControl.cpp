@@ -2,11 +2,16 @@
 
 DeviceControl::DeviceControl()
 {
+	m_is_output = true;
 	AudioControl::init(eRender, eConsole);
 }
 
 DeviceControl::DeviceControl(role i_eRole, dataFlow i_eDataFlow)
 {
+	if (i_eRole == eRender)
+	{
+		m_is_output = true;
+	}
 	AudioControl::init(i_eDataFlow, i_eRole);
 }
 

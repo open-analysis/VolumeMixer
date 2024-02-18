@@ -5,6 +5,7 @@
 #include <iostream>
 #include <set>
 #include "../utils/Utils.h"
+#include "../utils/Parser.h"
 
 #pragma comment(lib, "WinHttp.lib")
 
@@ -21,10 +22,10 @@ private:
 public:
 	WebClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
 
-	void handshake(const std::set<std::wstring> i_devNames, const std::set<std::wstring> i_progNames);
+	void handshake(std::vector<AudioDevice>& i_devices, std::vector<Audio>& i_programs, Parser& i_parser);
 	char* getQueue();
 	bool post(std::string i_buffer, LPCWSTR i_ext);
-	bool del(std::string i_buffer, LPCWSTR i_ext);
+	bool del(std::string i_buffer, LPCWSTR i_ext); // DEPRECIATED
 
 private:
 	bool request(LPCWSTR i_url, LPCWSTR i_action, LPCWSTR i_extension);

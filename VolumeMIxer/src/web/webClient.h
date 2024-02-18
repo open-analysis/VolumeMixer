@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <winhttp.h>
 #include <iostream>
+#include <set>
+#include "../utils/Utils.h"
 
 #pragma comment(lib, "WinHttp.lib")
 
@@ -19,6 +21,7 @@ private:
 public:
 	WebClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
 
+	void handshake(const std::set<std::wstring> i_devNames, const std::set<std::wstring> i_progNames);
 	char* getQueue();
 	bool post(std::string i_buffer, LPCWSTR i_ext);
 	bool del(std::string i_buffer, LPCWSTR i_ext);
@@ -32,5 +35,7 @@ private:
 		if (m_httpRequest) WinHttpCloseHandle(m_httpRequest);
 	}
 
+	bool readData(const LPCWSTR i_url, const LPCWSTR i_extension, LPSTR& io_buffer);
+	bool sendData(const LPCWSTR i_url, const LPCWSTR i_action, const LPCWSTR i_extension, const std::string i_buffer);
 };
 

@@ -2,11 +2,11 @@
 
 #include <iostream>
 #include <vector>
-#include <string>
 
 #include "../audio/AudioControl.h"
 #include "../audio/DeviceControl.h"
-#include "../utils/Utils.h"
+#include "AudioStructs.h"
+#include "Utils.h"
 
 class Parser
 {
@@ -17,15 +17,17 @@ private:
 
 	std::vector<std::string> m_queue;
 
-	std::string m_JSON_SECTIONS[8] = {
-		"{",
-		"\"type\": ",
-		"\"in\", ",
-		"\"out\", ",
-		"\"name\": ",
-		"\"img\": ",
-		"\"default\": ",
-		"}"
+	std::string m_JSON_SECTIONS[10] = {
+		"{",				// 0
+		"\"type\": ",		// 1
+		"\"in\", ",			// 2
+		"\"out\", ",		// 3
+		"\"name\": ",		// 4
+		"\"img\": ",		// 5
+		"\"default\": ",	// 6
+		"\"volume\": ",		// 7
+		"\"mute\": ",		// 8
+		"}"					// 9
 	};
 
 	char c_lf_char;
@@ -39,8 +41,8 @@ public:
 	void setQueue(char* i_buffer);
 	void flushQueue() { m_queue.clear(); }
 
-	std::string device2Json(const bool i_isOutput, const std::wstring i_name, const std::string i_img, const bool i_default);
-	std::string program2Json(const std::wstring i_name, const std::string i_img);
+	std::string device2Json(const AudioDevice& i_audio_device);
+	std::string program2Json(const Audio& i_audio);
 
 	void setAudioCntl(AudioControl* i_audioCntl)
 	{

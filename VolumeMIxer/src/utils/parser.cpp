@@ -77,14 +77,14 @@ void Parser::setQueue(char* i_buffer)
 	}
 }
 
-std::string Parser::device2Json(const bool i_isOutput, const std::wstring i_name, const std::string i_img, const bool i_default)
+std::string Parser::device2Json(const AudioDevice& i_audio_device)
 {
 	std::string r_return = "";
 
 	r_return = m_JSON_SECTIONS[0]; // {
 
 	r_return += m_JSON_SECTIONS[1]; // "type": 
-	if (i_isOutput)
+	if (i_audio_device.m_is_output)
 	{
 		r_return += m_JSON_SECTIONS[3]; // "out",
 	}
@@ -95,16 +95,16 @@ std::string Parser::device2Json(const bool i_isOutput, const std::wstring i_name
 
 	r_return += m_JSON_SECTIONS[4]; // "name": 
 	r_return += "\"";
-	r_return += m_util.convertWstr2Str(i_name); // "", 
+	r_return += i_audio_device.m_name;
 	r_return += "\",";
 
 	r_return += m_JSON_SECTIONS[5]; // "img": 
 	r_return += "\"";
-	r_return += i_img; // "", 
+	r_return += i_audio_device.m_img; 
 	r_return += "\",";
 
 	r_return += m_JSON_SECTIONS[6]; // "default": 
-	if (i_default)
+	if (i_audio_device.m_is_default)
 	{
 		r_return += "true";
 	}
@@ -113,13 +113,23 @@ std::string Parser::device2Json(const bool i_isOutput, const std::wstring i_name
 		r_return += "false";
 	}
 
+	r_return += m_JSON_SECTIONS[7]; // "volume": 
+	r_return += "\"";
+	r_return += i_audio_device.m_volume; 
+	r_return += "\"";
 
-	r_return += m_JSON_SECTIONS[7]; // }
+	r_return += m_JSON_SECTIONS[8]; // "mute": 
+	r_return += "\"";
+	r_return += i_audio_device.m_mute; 
+	r_return += "\"";
+
+
+	r_return += m_JSON_SECTIONS[9]; // }
 	
 	return r_return;
 }
 
-std::string Parser::program2Json(const std::wstring i_name, const std::string i_img)
+std::string Parser::program2Json(const Audio& i_audio)
 {
 	std::string r_return = "";
 
@@ -127,15 +137,25 @@ std::string Parser::program2Json(const std::wstring i_name, const std::string i_
 	
 	r_return += m_JSON_SECTIONS[4]; // "name": 
 	r_return += "\"";
-	r_return += m_util.convertWstr2Str(i_name);
+	r_return += i_audio.m_name;
 	r_return += "\",";
 
 	r_return += m_JSON_SECTIONS[5]; // "img": 
 	r_return += "\"";
-	r_return += i_img; // "", 
+	r_return += i_audio.m_img; 
 	r_return += "\"";
 
-	r_return += m_JSON_SECTIONS[7]; // }
+	r_return += m_JSON_SECTIONS[7]; // "volume": 
+	r_return += "\"";
+	r_return += i_audio.m_volume; 
+	r_return += "\"";
+
+	r_return += m_JSON_SECTIONS[8]; // "mute": 
+	r_return += "\"";
+	r_return += i_audio.m_mute; 
+	r_return += "\"";
+
+	r_return += m_JSON_SECTIONS[9]; // }
 
 	return r_return;
 }

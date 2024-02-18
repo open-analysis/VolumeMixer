@@ -137,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\audio\DeviceControl.h" />
+    <ClInclude Include="src\utils\AudioStructs.h" />
     <ClInclude Include="src\utils\EndPointData.h" />
     <ClInclude Include="src\audio\AudioControl.h" />
     <ClInclude Include="src\utils\PolicyConfig.h" />

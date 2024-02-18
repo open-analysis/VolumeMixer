@@ -7,7 +7,7 @@
 #include "utils/Utils.h"
 #include "utils/AudioStructs.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #define WEB_CONN 0
 #define PROG_INPUT 0
 #define DEV_INPUT 0

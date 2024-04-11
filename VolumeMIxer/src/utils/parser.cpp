@@ -2,21 +2,23 @@
 
 Parser::Parser()
 {
-	std::cout << "Don't use this constructor" << std::endl;
+	std::cout << "Parser: Don't use this constructor" << std::endl;
 	m_audioCntl = nullptr;
 	m_devCntl = nullptr;
+	m_audio_programs = nullptr;
+	m_audio_devices = nullptr;
 	c_lf_char = 10;
 	m_util = Utils();
 }
 
-Parser::Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl) :
-	m_audioCntl(i_audioCntl), m_devCntl(i_devCntl)
+Parser::Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl, std::vector<Audio>* i_audio_programs, std::vector<AudioDevice>* i_audio_devices) :
+	m_audioCntl(i_audioCntl), m_devCntl(i_devCntl), m_audio_programs(i_audio_programs), m_audio_devices(i_audio_devices)
 {
 	m_util = Utils();
 	c_lf_char = 10;
 }
 
-void Parser::parseQueue(const std::string i_direction, const std::string i_type)
+void Parser::parseQueue()
 {
 
 	if (m_queue[0][0] == c_lf_char)
@@ -37,13 +39,8 @@ void Parser::parseQueue(const std::string i_direction, const std::string i_type)
 			l_cmds.push_back(t_queue.substr(l_cmd_start, (l_cmd_end - l_cmd_start)));
 		}
 
-		// Check if the cmds direction & type are correct
-		//  The direction is handled outside of this function
-		//  ie by setting Audio/DeviceControl 
-		if (l_cmds[0] != i_type || l_cmds[2] != i_direction) continue;
-
 		// Determine type that's being operated on
-		if (i_type == "device")
+		if (l_cmds[0] == "device")
 		{
 			parseCmdDevice(l_cmds);
 		}
@@ -112,16 +109,14 @@ std::string Parser::device2Json(const AudioDevice& i_audio_device)
 	{
 		r_return += "false";
 	}
+	r_return += ",";
 
 	r_return += m_JSON_SECTIONS[7]; // "volume": 
-	r_return += "\"";
-	r_return += i_audio_device.m_volume; 
-	r_return += "\"";
+	r_return += std::to_string(i_audio_device.m_volume);
+	r_return += ",";
 
 	r_return += m_JSON_SECTIONS[8]; // "mute": 
-	r_return += "\"";
-	r_return += i_audio_device.m_mute; 
-	r_return += "\"";
+	r_return += std::to_string(i_audio_device.m_mute);
 
 
 	r_return += m_JSON_SECTIONS[9]; // }
@@ -143,112 +138,113 @@ std::string Parser::program2Json(const Audio& i_audio)
 	r_return += m_JSON_SECTIONS[5]; // "img": 
 	r_return += "\"";
 	r_return += i_audio.m_img; 
-	r_return += "\"";
+	r_return += "\",";
 
 	r_return += m_JSON_SECTIONS[7]; // "volume": 
-	r_return += "\"";
-	r_return += i_audio.m_volume; 
-	r_return += "\"";
+	r_return += std::to_string(i_audio.m_volume);
+	std::cout << "Program Volume: " << i_audio.m_volume << std::endl;
+	r_return += ",";
 
 	r_return += m_JSON_SECTIONS[8]; // "mute": 
-	r_return += "\"";
-	r_return += i_audio.m_mute; 
-	r_return += "\"";
+	r_return += std::to_string(i_audio.m_mute);
+	std::cout << "Program Mute: " << i_audio.m_mute << std::endl;
 
 	r_return += m_JSON_SECTIONS[9]; // }
 
 	return r_return;
 }
 
+// Queue structure type$name$volume$mute$default$output
 void Parser::parseCmdDevice(std::vector<std::string> i_cmds)
 {
-	// Get the name of the device/program
-	std::wstring l_name = m_util.convertStr2Wstr(i_cmds[1]);
-
-
-	// Need to clean up the end of the command some
-	removeCharsFromString(i_cmds[3], &c_lf_char);
-
-	// Determine action
-	if (i_cmds[3] == "mute")
+	for (auto l_device : *m_audio_devices)
 	{
-		// Need to clean up the end of the command some
-		removeCharsFromString(i_cmds[4], &c_lf_char);
+		if (l_device.m_name == i_cmds[1])
+		{
+			// Get the name of the device/program
+			std::wstring l_name = m_util.convertStr2Wstr(i_cmds[1]);
 
-		// Determine state
-		if (i_cmds[4] == "True")
-		{
-			m_devCntl->setMute(&l_name, true);
-		}
-		// Determine state
-		else if (i_cmds[4] == "False")
-		{
-			m_devCntl->setMute(&l_name, false);
-		}
-		// Determine state
-		else if (i_cmds[4] == "toggle")
-		{
-			m_devCntl->toggleMute(&l_name);
-		}
-	}
-	// Determine action
-	else if (i_cmds[3] == "volume")
-	{
-		float l_vol = 0;
-		m_devCntl->getVolume(&l_name, &l_vol);
-		l_vol += (float)stoi(i_cmds[4]) / 100;
-		m_devCntl->setVolume(&l_name, l_vol);
-	}
-	// Determine action
-	else if (i_cmds[3] == "setDefault")
-	{
-		// Determine state
-		if (i_cmds[2] == "out")
-		{
-			m_devCntl->setDefaultEndpoint(&l_name, ERole::eConsole);
-		}
-		else
-		{
-			m_devCntl->setDefaultEndpoint(&l_name, ERole::eCommunications);
+			// Set volume
+			float l_vol = 0;
+			l_vol = (float)(stoi(i_cmds[2]) / 100);
+			m_devCntl->setVolume(&l_name, l_vol);
+			l_device.m_volume = stoi(i_cmds[2]);
+
+			// Set mute
+			// Need to clean up the end of the command some
+			removeCharsFromString(i_cmds[3], &c_lf_char);
+
+			// Determine mute state
+			if (i_cmds[3] == "True")
+			{
+				m_devCntl->setMute(&l_name, true);
+				l_device.m_mute = true;
+			}
+			else if (i_cmds[3] == "False")
+			{
+				m_devCntl->setMute(&l_name, false);
+				l_device.m_mute = false;
+			}
+
+			// Set Default
+			// Need to clean up the end of the command some
+			removeCharsFromString(i_cmds[4], &c_lf_char);  // Default
+			// Only update if this is true
+			if (i_cmds[4] == "True")
+			{
+				removeCharsFromString(i_cmds[5], &c_lf_char);  // Output
+				if (i_cmds[5] == "out")
+				{
+					m_devCntl->setDefaultEndpoint(&l_name, ERole::eConsole);
+				}
+				else
+				{
+					m_devCntl->setDefaultEndpoint(&l_name, ERole::eCommunications);
+				}
+			}
+
+			break;
 		}
 	}
 }
 
+// Queue structure type$name$volume$mute
 void Parser::parseCmdPrograms(std::vector<std::string> i_cmds)
 {
-	// Get the name of the device/program
-	std::wstring l_name = m_util.convertStr2Wstr(i_cmds[1]);
-
-	// Determine action
-	if (i_cmds[3] == "mute")
+	for (auto l_program : *m_audio_programs)
 	{
-		// Need to clean up the end of the command some
-		removeCharsFromString(i_cmds[4], &c_lf_char);
+		if (l_program.m_name == i_cmds[1])
+		{
+			// Get the name of the device/program
+			std::wstring l_name = m_util.convertStr2Wstr(i_cmds[1]);
 
-		// Determine state
-		if (i_cmds[4] == "True")
-		{
-			m_audioCntl->setMute(&l_name, true);
-		}
-		// Determine state
-		else if (i_cmds[4] == "False")
-		{
-			m_audioCntl->setMute(&l_name, false);
-		}
-		// Determine state
-		else if (i_cmds[4] == "toggle")
-		{
-			m_audioCntl->toggleMute(&l_name);
+			// Set volume
+			float l_vol = 0;
+			l_vol = (float)stoi(i_cmds[4]) / 100;
+			m_audioCntl->setVolume(&l_name, l_vol);
+			l_program.m_volume = stoi(i_cmds[4]);
+
+			// Set mute
+			// Need to clean up the end of the command some
+			removeCharsFromString(i_cmds[4], &c_lf_char);
+
+			// Determine state
+			if (i_cmds[3] == "True")
+			{
+				m_audioCntl->setMute(&l_name, true);
+				l_program.m_mute = true;
+			}
+			// Determine state
+			else if (i_cmds[3] == "False")
+			{
+				m_audioCntl->setMute(&l_name, false);
+				l_program.m_mute = false;
+			}
+
+			break;
 		}
 	}
-	// Determine action
-	else if (i_cmds[3] == "volume")
-	{
-		float l_vol = 0;
-		m_audioCntl->getVolume(&l_name, &l_vol);
-		l_vol += (float)stoi(i_cmds[4]) / 100;
-		m_audioCntl->setVolume(&l_name, l_vol);
-	}
+
 }
 
 void Parser::removeCharsFromString(std::string& str, char* charsToRemove) {

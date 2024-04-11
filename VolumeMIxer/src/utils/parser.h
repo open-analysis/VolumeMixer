@@ -13,6 +13,8 @@ class Parser
 private:
 	AudioControl* m_audioCntl;
 	DeviceControl* m_devCntl;
+	std::vector<Audio>* m_audio_programs;
+	std::vector<AudioDevice>* m_audio_devices;
 	Utils m_util;
 
 	std::vector<std::string> m_queue;
@@ -34,9 +36,9 @@ private:
 
 public:
 	Parser();
-	Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl);
+	Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl, std::vector<Audio>* i_audio_programs, std::vector<AudioDevice>* i_audio_devices);
 
-	void parseQueue(const std::string i_direction, const std::string i_type);
+	void parseQueue();
 
 	void setQueue(const char* i_buffer);
 	void flushQueue() { m_queue.clear(); }

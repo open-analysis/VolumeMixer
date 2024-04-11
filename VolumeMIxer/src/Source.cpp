@@ -7,10 +7,9 @@
 #include "utils/Utils.h"
 #include "utils/AudioStructs.h"
 
-#define DEBUG 0
-#define WEB_CONN 0
-#define PROG_INPUT 0
-#define DEV_INPUT 0
+#define DEBUG 1
+#define WEB_CONN 1
+#define INPUT 1
 #define SLEEP_TIME 1000
 
 // Make sure the current list of device names is in the set
@@ -102,17 +101,18 @@ void runProgram()
 	std::vector<AudioDevice> l_output_audio_devices;
 	std::vector<Audio> l_output_audio_programs;
 
-	Parser l_parser = Parser(&l_progOutputCntl, &l_devOutputCntl);
+	std::cout << "Building parser" << std::endl;
+	Parser l_parser = Parser(&l_progOutputCntl, &l_devOutputCntl, &l_output_audio_programs, &l_output_audio_devices);
+	std::cout << "Built parser" << std::endl;
 
-#if PROG_INPUT
+#if INPUT
 	AudioControl l_progInputCntl = AudioControl();
 	l_progInputCntl.init(eCapture, eCommunications);
-	std::set<std::wstring> l_progInputNames;
-#endif
-#if DEV_INPUT
+	std::vector<Audio> l_input_audio_programs;
+
 	DeviceControl l_devInputCntl = DeviceControl();
 	l_devInputCntl.init(eCapture, eCommunications);
-	std::set<std::wstring> l_devInputNames;
+	std::vector<AudioDevice> l_input_audio_devices;
 #endif
 
 	std::vector<std::wstring> l_currNames;
@@ -126,7 +126,7 @@ void runProgram()
 #endif
 
 #if WEB_CONN
-		l_client.handshake(l_output_audio_devices, l_output_audio_programs);
+		l_client.handshake(l_output_audio_devices, l_output_audio_programs, l_parser);
 #endif
 
 		// Get & send computer data to server
@@ -134,12 +134,13 @@ void runProgram()
 		// DEVICES
 		l_devOutputCntl.getStreams(l_currNames);
 		updateClientDevices(l_currNames, &l_devOutputCntl, &l_output_audio_devices);
+		l_currNames.clear();
 #if DEBUG
 		std::cout << "\tOutput Devices" << std::endl;
 		for (auto l_tmp : l_output_audio_devices)
 			std::cout << l_tmp.m_name << std::endl;
 		
-		std::cout << "\tOutput Device Action" << std::endl;
+		std::cout << "\tOutput Device Action" << std ::endl;
 		for (auto l_tmp1 : l_actions)
 			for (auto l_tmp : l_tmp1)
 				std::wcout << l_tmp << std::endl;
@@ -148,6 +149,7 @@ void runProgram()
 		// PROGRAMS
 		l_progOutputCntl.getStreams(l_currNames);
 		updateClientPrograms(l_currNames, &l_progOutputCntl, &l_output_audio_programs);
+		l_currNames.clear();
 #if DEBUG
 		std::cout << "\tOutput Programs" << std::endl;
 		for (auto l_tmp : l_output_audio_programs)
@@ -159,27 +161,27 @@ void runProgram()
 				std::wcout << l_tmp << std::endl;
 #endif
 
-#if DEV_INPUT
+#if INPUT
 		l_devInputCntl.getStreams(l_currNames);
-		l_actions = getComputerData(&l_client, &l_devInputCntl, &l_devInputNames);
+		updateClientDevices(l_currNames, &l_devOutputCntl, &l_input_audio_devices);
 		l_currNames.clear();
 #if DEBUG
 		std::cout << "Input Devices" << std::endl;
-		for (auto l_tmp : l_devInputNames)
-			std::wcout << l_tmp << std::endl;
+		for (auto l_tmp : l_input_audio_devices)
+			std::cout << l_tmp.m_name << std::endl;
 		for (auto l_tmp1 : l_actions)
 			for (auto l_tmp : l_tmp1)
 				std::wcout << l_tmp << std::endl;
 #endif
 #endif
-#if PROG_INPUT
+#if INPUT
 		l_progInputCntl.getStreams(l_currNames);
-		l_actions = getComputerData(&l_client, &l_progInputCntl, &l_progInputNames);
+		updateClientPrograms(l_currNames, &l_progOutputCntl, &l_input_audio_programs);
 		l_currNames.clear();
 #if DEBUG
-		std::cout << "Input Devices" << std::endl;
-		for (auto l_tmp : l_progInputNames)
-			std::wcout << l_tmp << std::endl;
+		std::cout << "Input Programs" << std::endl;
+		for (auto l_tmp : l_input_audio_programs)
+			std::cout << l_tmp.m_name << std::endl;
 		for (auto l_tmp1 : l_actions)
 			for (auto l_tmp : l_tmp1)
 				std::wcout << l_tmp << std::endl;
@@ -191,22 +193,15 @@ void runProgram()
 		// IE update the queue of actions from the server & update the server with client data
 		l_client.handshake(l_output_audio_devices, l_output_audio_programs, l_parser);
 
+#if INPUT
+		// Update the input devices
+		l_client.handshake(l_input_audio_devices, l_input_audio_programs, l_parser);
+#endif
+
 		// Parse received data
-		l_parser.parseQueue("out", "device");
-		l_parser.parseQueue("out", "program");
+		l_parser.parseQueue();
 #endif
 
-#if PROG_INPUT
-		l_parser.setAudioCntl(&l_progInputCntl);
-		l_parser.parseQueue("in", "program");
-		l_parser.setAudioCntl(&l_progOutputCntl);
-#endif
-#if DEV_INPUT
-		l_parser.setAudioCntl(&l_devInputCntl);
-		l_parser.parseQueue("in", "device");
-		l_parser.setAudioCntl(&l_devOutputCntl);
-
-#endif 
 		// Empty the queue
 		l_parser.flushQueue();
 
@@ -219,10 +214,8 @@ void runProgram()
 	l_progOutputCntl.destroy();
 	l_devOutputCntl.destroy();
 
-#if PROG_INPUT
+#if INPUT
 	l_progInputCntl.destroy();
-#endif
-#if DEV_INPUT
 	l_devInputCntl.destroy();
 #endif
 }

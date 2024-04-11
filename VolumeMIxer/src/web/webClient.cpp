@@ -1,9 +1,10 @@
 #include "WebClient.h"
 
-char* WebClient::getQueue()
+std::string WebClient::getQueue()
 {
 	bool l_results = true;
 	LPSTR l_buffer = NULL;
+	std::string l_str = "";
 	
 	l_results = readData(MIXER_IP_ADDR, L"queue", l_buffer);
 
@@ -12,7 +13,17 @@ char* WebClient::getQueue()
 		l_buffer = NULL;
 	}
 
-	return l_buffer;
+	if (l_buffer == NULL)
+	{
+		l_str = "";
+	}
+	else
+	{
+		//l_str = const_cast<std::string>(l_buffer);
+		l_str = l_buffer;
+	}
+
+	return l_str;
 }
 
 void WebClient::handshake(std::vector<AudioDevice>& i_devices, std::vector<Audio>& i_programs, Parser& i_parser)
@@ -21,12 +32,14 @@ void WebClient::handshake(std::vector<AudioDevice>& i_devices, std::vector<Audio
 	//LPSTR l_buffer = NULL;
 	std::string l_buffer = "";
 	Utils l_util = Utils();
-	Parser l_parser = Parser();
 
 	// Get the queue from the server
 	l_buffer = getQueue();
 	// Set the queue in the parser
-	i_parser.setQueue(l_buffer.c_str());
+	if (l_buffer != "")
+	{
+		i_parser.setQueue(l_buffer.c_str());
+	}
 
 	l_buffer = "";
 

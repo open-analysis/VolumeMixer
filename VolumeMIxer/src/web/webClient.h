@@ -23,7 +23,7 @@ public:
 	WebClient() { m_httpSession = NULL; m_httpConnect = NULL; m_httpRequest = NULL; }
 
 	void handshake(std::vector<AudioDevice>& i_devices, std::vector<Audio>& i_programs, Parser& i_parser);
-	char* getQueue();
+	std::string getQueue();
 	bool post(std::string i_buffer, LPCWSTR i_ext);
 	bool del(std::string i_buffer, LPCWSTR i_ext); // DEPRECIATED
 

@@ -7,9 +7,9 @@
 #include "utils/Utils.h"
 #include "utils/AudioStructs.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #define WEB_CONN 1
-#define INPUT 1
+#define INPUT 0
 #define SLEEP_TIME 1000
 
 // Make sure the current list of device names is in the set
@@ -101,9 +101,7 @@ void runProgram()
 	std::vector<AudioDevice> l_output_audio_devices;
 	std::vector<Audio> l_output_audio_programs;
 
-	std::cout << "Building parser" << std::endl;
 	Parser l_parser = Parser(&l_progOutputCntl, &l_devOutputCntl, &l_output_audio_programs, &l_output_audio_devices);
-	std::cout << "Built parser" << std::endl;
 
 #if INPUT
 	AudioControl l_progInputCntl = AudioControl();
@@ -139,11 +137,6 @@ void runProgram()
 		std::cout << "\tOutput Devices" << std::endl;
 		for (auto l_tmp : l_output_audio_devices)
 			std::cout << l_tmp.m_name << std::endl;
-		
-		std::cout << "\tOutput Device Action" << std ::endl;
-		for (auto l_tmp1 : l_actions)
-			for (auto l_tmp : l_tmp1)
-				std::wcout << l_tmp << std::endl;
 #endif
 
 		// PROGRAMS
@@ -154,11 +147,6 @@ void runProgram()
 		std::cout << "\tOutput Programs" << std::endl;
 		for (auto l_tmp : l_output_audio_programs)
 			std::cout << l_tmp.m_name << std::endl;
-
-		std::cout << "\tOutput Program Action" << std::endl;
-		for (auto l_tmp1 : l_actions)
-			for (auto l_tmp : l_tmp1)
-				std::wcout << l_tmp << std::endl;
 #endif
 
 #if INPUT
@@ -169,9 +157,6 @@ void runProgram()
 		std::cout << "Input Devices" << std::endl;
 		for (auto l_tmp : l_input_audio_devices)
 			std::cout << l_tmp.m_name << std::endl;
-		for (auto l_tmp1 : l_actions)
-			for (auto l_tmp : l_tmp1)
-				std::wcout << l_tmp << std::endl;
 #endif
 #endif
 #if INPUT
@@ -181,10 +166,7 @@ void runProgram()
 #if DEBUG
 		std::cout << "Input Programs" << std::endl;
 		for (auto l_tmp : l_input_audio_programs)
-			std::cout << l_tmp.m_name << std::endl;
-		for (auto l_tmp1 : l_actions)
-			for (auto l_tmp : l_tmp1)
-				std::wcout << l_tmp << std::endl;
+			std::cout << l_tmp.m_name << std::endl
 #endif
 #endif
 

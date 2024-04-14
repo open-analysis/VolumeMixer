@@ -21,6 +21,8 @@ Parser::Parser(AudioControl* i_audioCntl, DeviceControl* i_devCntl, std::vector<
 void Parser::parseQueue()
 {
 
+	if (m_queue.empty())
+		return;
 	if (m_queue[0][0] == c_lf_char)
 		return;
 
@@ -142,12 +144,10 @@ std::string Parser::program2Json(const Audio& i_audio)
 
 	r_return += m_JSON_SECTIONS[7]; // "volume": 
 	r_return += std::to_string(i_audio.m_volume);
-	std::cout << "Program Volume: " << i_audio.m_volume << std::endl;
 	r_return += ",";
 
 	r_return += m_JSON_SECTIONS[8]; // "mute": 
 	r_return += std::to_string(i_audio.m_mute);
-	std::cout << "Program Mute: " << i_audio.m_mute << std::endl;
 
 	r_return += m_JSON_SECTIONS[9]; // }
 
